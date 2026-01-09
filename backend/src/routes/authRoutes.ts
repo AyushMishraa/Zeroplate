@@ -18,7 +18,7 @@ router.get(
     console.log("req.user", req.user);
     // @ts-ignore
     const token = generateToken(req.user.email, req.user.role, req.user._id);
-    res.json({ success: true, token, message: "Google authentication successful" });
+    res.json({ success: true, token: token, message: "Google authentication successful" });
   }
 );
 
