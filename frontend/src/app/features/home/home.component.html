@@ -1,148 +1,353 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100">
-  <!-- Navigation Bar -->
-  <mat-toolbar class="bg-white shadow-md">
-    <div class="flex items-center justify-between w-full px-4">
-      <div class="flex items-center space-x-2">
-        <mat-icon class="text-purple-600">restaurant</mat-icon>
-        <span class="text-2xl font-bold text-gray-800">ZeroPlate</span>
+<div class="home-container">
+  <!-- Enhanced Animated Background with Vector Arts -->
+  <div class="particles-container">
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+    <div class="particle particle-5"></div>
+    <div class="particle particle-6"></div>
+    <div class="particle particle-7"></div>
+  </div>
+
+  <!-- Vector Art Decorations -->
+  <div class="vector-arts">
+    <div class="vector-art vector-1">
+      <svg viewBox="0 0 200 200" class="food-icon">
+        <path d="M100,20 L180,60 L180,140 L100,180 L20,140 L20,60 Z" fill="rgba(102, 126, 234, 0.1)" stroke="rgba(102, 126, 234, 0.3)" stroke-width="2"/>
+        <circle cx="100" cy="100" r="30" fill="rgba(118, 75, 162, 0.15)"/>
+      </svg>
+    </div>
+    <div class="vector-art vector-2">
+      <svg viewBox="0 0 200 200" class="community-icon">
+        <circle cx="100" cy="100" r="60" fill="rgba(79, 172, 254, 0.1)" stroke="rgba(79, 172, 254, 0.3)" stroke-width="2"/>
+        <path d="M100,40 L120,80 L100,120 L80,80 Z" fill="rgba(0, 242, 254, 0.15)"/>
+      </svg>
+    </div>
+    <div class="vector-art vector-3">
+      <svg viewBox="0 0 200 200" class="heart-icon">
+        <path d="M100,50 C80,30 50,40 50,70 C50,100 100,140 100,140 C100,140 150,100 150,70 C150,40 120,30 100,50 Z" fill="rgba(236, 72, 153, 0.1)" stroke="rgba(236, 72, 153, 0.3)" stroke-width="2"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Enhanced Navigation Bar -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-brand" (click)="router.navigate(['/home'])" style="cursor: pointer;">
+        <mat-icon class="brand-icon">restaurant_menu</mat-icon>
+        <span class="brand-text">ZeroPlate</span>
       </div>
       
-      <div class="flex items-center space-x-4">
+      <!-- Navigation Menu -->
+      <nav class="navbar-menu">
+        <button mat-button (click)="router.navigate(['/home'])" class="nav-link" [class.active]="currentRoute === '/home'">
+          <mat-icon>home</mat-icon>
+          <span>Home</span>
+        </button>
         @if (currentUser) {
-          <div class="flex items-center space-x-3">
-            <div class="text-right hidden md:block">
-              <p class="text-sm font-semibold text-gray-800">{{ currentUser.name }}</p>
-              <span [class]="'text-xs px-2 py-1 rounded-full ' + getRoleBadgeColor(currentUser.role)">
-                {{ getRoleLabel(currentUser.role) }}
-              </span>
+          @if (currentUser.role === 'donor' || currentUser.role === 'admin') {
+            <button mat-button (click)="handleAction('list-food')" class="nav-link" [class.active]="currentRoute === '/add-food'">
+              <mat-icon>add_circle</mat-icon>
+              <span>List Food</span>
+            </button>
+          }
+          @if (currentUser.role === 'receiver' || currentUser.role === 'admin') {
+            <button mat-button (click)="handleAction('browse-food')" class="nav-link" [class.active]="currentRoute === '/browse-food'">
+              <mat-icon>search</mat-icon>
+              <span>Browse Food</span>
+            </button>
+            <button mat-button (click)="router.navigate(['/claims'])" class="nav-link" [class.active]="currentRoute === '/claims'">
+              <mat-icon>shopping_cart</mat-icon>
+              <span>My Claims</span>
+            </button>
+          }
+          @if (currentUser.role === 'admin') {
+            <button mat-button (click)="router.navigate(['/admin/dashboard'])" class="nav-link" [class.active]="currentRoute === '/admin/dashboard'">
+              <mat-icon>dashboard</mat-icon>
+              <span>Admin</span>
+            </button>
+            <button mat-button (click)="router.navigate(['/analytics'])" class="nav-link" [class.active]="currentRoute === '/analytics'">
+              <mat-icon>analytics</mat-icon>
+              <span>Analytics</span>
+            </button>
+          }
+          <!-- @if (currentUser.role === 'volunteer') {
+            <button mat-button (click)="router.navigate(['/volunteer/dashboard'])" class="nav-link" [class.active]="currentRoute === '/volunteer/dashboard'">
+              <mat-icon>local_shipping</mat-icon>
+              <span>Volunteer</span>
+            </button>
+          } -->
+          <button mat-button (click)="router.navigate(['/profile'])" class="nav-link" [class.active]="currentRoute === '/profile'">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+        } @else {
+          <button mat-button (click)="handleAction('list-food')" class="nav-link">
+            <mat-icon>add_circle</mat-icon>
+            <span>List Food</span>
+          </button>
+          <button mat-button (click)="handleAction('browse-food')" class="nav-link">
+            <mat-icon>search</mat-icon>
+            <span>Browse Food</span>
+          </button>
+        }
+      </nav>
+      
+      <div class="navbar-actions">
+        @if (currentUser) {
+          <div class="user-info">
+            <div class="user-details">
+              <p class="user-name">{{ currentUser.name }}</p>
             </div>
             <button 
               mat-icon-button 
               [matMenuTriggerFor]="userMenu"
-              class="text-gray-600">
+              class="user-menu-button">
               <mat-icon>account_circle</mat-icon>
             </button>
-            <mat-menu #userMenu="matMenu">
-              <button mat-menu-item (click)="logout()">
+            <mat-menu #userMenu="matMenu" class="user-menu">
+              <button mat-menu-item (click)="router.navigate(['/home'])" class="menu-item">
+                <mat-icon>home</mat-icon>
+                <span>Home</span>
+              </button>
+              @if (currentUser?.role === 'donor' || currentUser?.role === 'admin') {
+                <button mat-menu-item (click)="handleAction('list-food')" class="menu-item">
+                  <mat-icon>add_circle</mat-icon>
+                  <span>List Food</span>
+                </button>
+              }
+              @if (currentUser?.role === 'receiver' || currentUser?.role === 'admin') {
+                <button mat-menu-item (click)="handleAction('browse-food')" class="menu-item">
+                  <mat-icon>search</mat-icon>
+                  <span>Browse Food</span>
+                </button>
+                <button mat-menu-item (click)="router.navigate(['/claims'])" class="menu-item">
+                  <mat-icon>shopping_cart</mat-icon>
+                  <span>My Claims</span>
+                </button>
+              }
+              @if (currentUser?.role === 'admin') {
+                <button mat-menu-item (click)="router.navigate(['/admin/dashboard'])" class="menu-item">
+                  <mat-icon>dashboard</mat-icon>
+                  <span>Admin Dashboard</span>
+                </button>
+                <button mat-menu-item (click)="router.navigate(['/analytics'])" class="menu-item">
+                  <mat-icon>analytics</mat-icon>
+                  <span>Analytics</span>
+                </button>
+              }
+              <!-- @if (currentUser?.role === 'volunteer') {
+                <button mat-menu-item (click)="router.navigate(['/volunteer/dashboard'])" class="menu-item">
+                  <mat-icon>local_shipping</mat-icon>
+                  <span>Volunteer Dashboard</span>
+                </button>
+              } -->
+              <button mat-menu-item (click)="router.navigate(['/profile'])" class="menu-item">
+                <mat-icon>person</mat-icon>
+                <span>Profile</span>
+              </button>
+              <mat-divider></mat-divider>
+              <button mat-menu-item (click)="logout()" class="menu-item">
                 <mat-icon>logout</mat-icon>
                 <span>Logout</span>
               </button>
             </mat-menu>
+          </div>
+        } @else {
+          <div class="auth-buttons">
+            <button mat-stroked-button (click)="navigateToLogin()" class="login-btn">
+              <mat-icon>login</mat-icon>
+              <span>Login</span>
+            </button>
+            <button mat-raised-button (click)="navigateToSignup()" class="signup-btn">
+              <mat-icon>person_add</mat-icon>
+              <span>Sign Up</span>
+            </button>
           </div>
         }
       </div>
     </div>
   </mat-toolbar>
 
-  <!-- Hero Section -->
-  <div class="relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-red-500">
-    <div class="absolute inset-0 bg-black opacity-10"></div>
-    <div class="relative max-w-7xl mx-auto px-4 py-24 sm:px-6 lg:px-8">
-      <div class="text-center">
-        <h1 class="text-5xl md:text-6xl font-extrabold text-white mb-6 animate-fade-in">
-          Reduce Food Waste,
-          <span class="block text-yellow-300">Feed Communities</span>
+  <!-- Modern Hero Section -->
+  <section class="hero-section">
+    <div class="hero-background"></div>
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1 class="hero-title">
+          <span class="hero-title-main">Reduce Food Waste,</span>
+          <span class="hero-title-gradient">Feed Communities</span>
         </h1>
-        <p class="text-xl md:text-2xl text-white/90 mb-8 max-w-3xl mx-auto">
+        <p class="hero-subtitle">
           Connect restaurants, supermarkets, and households with NGOs and food banks. 
           Together, we can make a difference.
         </p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center">
-          <button mat-raised-button color="accent" class="text-lg px-8 py-3">
-            <mat-icon>add_circle</mat-icon>
-            <span class="ml-2">List Food</span>
+        <div class="hero-buttons">
+          <button mat-raised-button class="hero-primary-btn" (click)="handleAction('list-food')">
+            Get Started
+            <mat-icon>arrow_forward</mat-icon>
           </button>
-          <button mat-stroked-button class="text-lg px-8 py-3 bg-white/10 text-white border-white">
-            <mat-icon>search</mat-icon>
-            <span class="ml-2">Browse Food</span>
+          <button mat-stroked-button class="hero-secondary-btn" (click)="handleAction('browse-food')">
+            Learn More
           </button>
         </div>
       </div>
-    </div>
-  </div>
-
-  <!-- Stats Section -->
-  <div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-      @for (stat of stats; track stat.label) {
-        <mat-card class="text-center p-6 hover:shadow-lg transition-shadow duration-300">
-          <div class="flex flex-col items-center">
-            <mat-icon [class]="'text-5xl mb-4 ' + stat.color">{{ stat.icon }}</mat-icon>
-            <h3 class="text-3xl font-bold text-gray-800 mb-2">{{ stat.value }}</h3>
-            <p class="text-gray-600">{{ stat.label }}</p>
+      <div class="hero-visual">
+        <div class="hero-card-grid">
+          <div class="hero-card hero-card-1">
+            <mat-icon>restaurant</mat-icon>
+            <span>Food Saved</span>
           </div>
-        </mat-card>
-      }
+          <div class="hero-card hero-card-2">
+            <mat-icon>groups</mat-icon>
+            <span>Communities</span>
+          </div>
+          <div class="hero-card hero-card-3">
+            <mat-icon>volunteer_activism</mat-icon>
+            <span>Impact</span>
+          </div>
+        </div>
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Features Section -->
-  <div class="bg-white py-16">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h2 class="text-4xl font-bold text-center text-gray-800 mb-4">How It Works</h2>
-      <p class="text-center text-gray-600 mb-12 max-w-2xl mx-auto">
-        ZeroPlate makes it easy to connect surplus food with those who need it most
-      </p>
-      
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-        @for (feature of features; track feature.title) {
-          <mat-card class="p-6 hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-            <div [class]="'w-16 h-16 rounded-full flex items-center justify-center mb-4 ' + feature.color">
-              <mat-icon class="text-white text-3xl">{{ feature.icon }}</mat-icon>
+  <!-- Modern Stats Section -->
+  <section class="stats-section">
+    <div class="stats-container">
+      <div class="stats-grid">
+        @for (stat of stats; track stat.label; let i = $index) {
+          <div class="stat-item">
+            <div class="stat-icon" [class]="'stat-icon-' + (i + 1)">
+              <mat-icon>{{ stat.icon }}</mat-icon>
             </div>
-            <h3 class="text-xl font-bold text-gray-800 mb-3">{{ feature.title }}</h3>
-            <p class="text-gray-600">{{ feature.description }}</p>
-          </mat-card>
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
         }
       </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Call to Action Section -->
-  <div class="bg-gradient-to-r from-purple-600 to-pink-600 py-16">
-    <div class="max-w-4xl mx-auto px-4 text-center">
-      <h2 class="text-4xl font-bold text-white mb-4">Ready to Make a Difference?</h2>
-      <p class="text-xl text-white/90 mb-8">
-        Join thousands of organizations already reducing food waste and feeding communities
-      </p>
-      <button mat-raised-button color="accent" class="text-lg px-8 py-3">
-        Get Started Today
-        <mat-icon class="ml-2">arrow_forward</mat-icon>
-      </button>
+  <!-- Modern Features Section -->
+  <section class="features-section">
+    <div class="features-container">
+      <div class="section-header">
+        <h2 class="section-title">How It Works</h2>
+        <p class="section-subtitle">
+          ZeroPlate makes it easy to connect surplus food with those who need it most
+        </p>
+      </div>
+      
+      <div class="features-grid">
+        @for (feature of features; track feature.title; let i = $index) {
+          <div class="feature-item">
+            <div class="feature-number">{{ i + 1 }}</div>
+            <div class="feature-icon" [class]="'feature-icon-' + (i + 1)">
+              <mat-icon>{{ feature.icon }}</mat-icon>
+            </div>
+            <h3 class="feature-title">{{ feature.title }}</h3>
+            <p class="feature-description">{{ feature.description }}</p>
+          </div>
+        }
+      </div>
     </div>
-  </div>
+  </section>
 
-  <!-- Footer -->
-  <footer class="bg-gray-800 text-white py-8">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-        <div>
-          <h3 class="text-xl font-bold mb-4">ZeroPlate</h3>
-          <p class="text-gray-400">
+  <!-- Modern Testimonials Section -->
+  <section class="testimonials-section">
+    <div class="testimonials-container">
+      <div class="section-header">
+        <h2 class="section-title">What People Say</h2>
+        <p class="section-subtitle">
+          Real stories from our community of food waste warriors
+        </p>
+      </div>
+      
+      <div class="testimonials-grid">
+        @for (testimonial of testimonials; track testimonial.name; let i = $index) {
+          <div class="testimonial-item">
+            <div class="testimonial-quote">
+              <mat-icon>format_quote</mat-icon>
+            </div>
+            <p class="testimonial-text">"{{ testimonial.text }}"</p>
+            <div class="testimonial-author">
+              <div class="testimonial-avatar">{{ testimonial.image }}</div>
+              <div class="testimonial-info">
+                <div class="testimonial-name">{{ testimonial.name }}</div>
+                <div class="testimonial-role">{{ testimonial.role }} · {{ testimonial.organization }}</div>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Modern CTA Section -->
+  <section class="cta-section">
+    <div class="cta-container">
+      <div class="cta-content">
+        <h2 class="cta-title">Ready to Make a Difference?</h2>
+        <p class="cta-subtitle">
+          Join thousands of organizations already reducing food waste and feeding communities
+        </p>
+        <div class="cta-buttons">
+          <button mat-raised-button class="cta-primary-btn" (click)="handleAction('get-started')">
+            Get Started Free
+            <mat-icon>arrow_forward</mat-icon>
+          </button>
+          <button mat-stroked-button class="cta-secondary-btn" (click)="handleAction('browse-food')">
+            View Demo
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Enhanced Footer -->
+  <footer class="footer">
+    <div class="footer-container">
+      <div class="footer-grid">
+        <div class="footer-column">
+          <div class="footer-brand">
+            <mat-icon class="footer-brand-icon">restaurant_menu</mat-icon>
+            <span class="footer-brand-text">ZeroPlate</span>
+          </div>
+          <p class="footer-description">
             Connecting communities to reduce food waste and fight hunger.
           </p>
         </div>
-        <div>
-          <h4 class="font-semibold mb-4">Quick Links</h4>
-          <ul class="space-y-2 text-gray-400">
-            <li><a href="#" class="hover:text-white">About Us</a></li>
-            <li><a href="#" class="hover:text-white">How It Works</a></li>
-            <li><a href="#" class="hover:text-white">Contact</a></li>
+        <div class="footer-column">
+          <h4 class="footer-heading">Quick Links</h4>
+          <ul class="footer-links">
+            <li><a href="#" class="footer-link">About Us</a></li>
+            <li><a href="#" class="footer-link">How It Works</a></li>
+            <li><a href="#" class="footer-link">Contact</a></li>
+            <li><a href="#" class="footer-link">Privacy Policy</a></li>
           </ul>
         </div>
-        <div>
-          <h4 class="font-semibold mb-4">Connect</h4>
-          <div class="flex space-x-4">
-            <mat-icon class="cursor-pointer hover:text-purple-400">facebook</mat-icon>
-            <mat-icon class="cursor-pointer hover:text-purple-400">twitter</mat-icon>
-            <mat-icon class="cursor-pointer hover:text-purple-400">linkedin</mat-icon>
+        <div class="footer-column">
+          <h4 class="footer-heading">Connect</h4>
+          <div class="social-links">
+            <a href="#" class="social-link" aria-label="Facebook">
+              <mat-icon>facebook</mat-icon>
+            </a>
+            <a href="#" class="social-link" aria-label="Twitter">
+              <mat-icon>alternate_email</mat-icon>
+            </a>
+            <a href="#" class="social-link" aria-label="LinkedIn">
+              <mat-icon>work</mat-icon>
+            </a>
+            <a href="#" class="social-link" aria-label="Instagram">
+              <mat-icon>photo_camera</mat-icon>
+            </a>
           </div>
         </div>
       </div>
-      <div class="border-t border-gray-700 mt-8 pt-8 text-center text-gray-400">
+      <div class="footer-bottom">
         <p>&copy; 2024 ZeroPlate. All rights reserved.</p>
       </div>
     </div>
   </footer>
 </div>
-

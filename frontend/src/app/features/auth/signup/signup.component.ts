@@ -79,26 +79,40 @@ export class SignupComponent {
         provider: 'local' as const
       };
 
+      console.log('Submitting signup data:', { ...signupData, password: '***' });
+
       this.authService.signup(signupData).subscribe({
         next: (response) => {
+          console.log('Signup successful:', response);
           this.isLoading = false;
           this.snackBar.open('Account created successfully! Please login.', 'Close', {
             duration: 3000,
             horizontalPosition: 'center',
-            verticalPosition: 'top'
+            verticalPosition: 'top',
+            panelClass: ['info-snackbar']
           });
-          // Redirect to login if user data not in response, otherwise go to home
-          if (response.user) {
-            this.router.navigate(['/home']);
-          } else {
-            setTimeout(() => {
-              this.router.navigate(['/login']);
-            }, 1500);
-          }
+          // Navigate to login page after successful signup
+          setTimeout(() => {
+            this.router.navigate(['/login']);
+          }, 1500);
         },
         error: (error) => {
+          console.error('Signup error:', error);
           this.isLoading = false;
-          const errorMessage = error.error?.message || 'Signup failed. Please try again.';
+          let errorMessage = 'Signup failed. Please try again.';
+          
+          if (error.error?.message) {
+            errorMessage = error.error.message;
+          } else if (error.message) {
+            errorMessage = error.message;
+          } else if (error.status === 0) {
+            errorMessage = 'Unable to connect to server. Please check your connection.';
+          } else if (error.status === 400) {
+            errorMessage = error.error?.message || 'Invalid data. Please check your input.';
+          } else if (error.status === 500) {
+            errorMessage = 'Server error. Please try again later.';
+          }
+          
           this.snackBar.open(errorMessage, 'Close', {
             duration: 5000,
             horizontalPosition: 'center',
@@ -108,7 +122,14 @@ export class SignupComponent {
         }
       });
     } else {
+      console.log('Form is invalid:', this.signupForm.errors);
       this.markFormGroupTouched();
+      this.snackBar.open('Please fill all required fields correctly', 'Close', {
+        duration: 3000,
+        horizontalPosition: 'center',
+        verticalPosition: 'top',
+        panelClass: ['error-snackbar']
+      });
     }
   }
 

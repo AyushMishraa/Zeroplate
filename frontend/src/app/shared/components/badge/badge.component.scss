@@ -1,0 +1,44 @@
+.badge {
+  display: inline-block;
+  padding: 0.375rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  text-transform: capitalize;
+  font-size: var(--font-size-sm);
+  
+  &.badge-small {
+    padding: 0.25rem 0.5rem;
+    font-size: var(--font-size-xs);
+  }
+  
+  &.badge-large {
+    padding: 0.5rem 1rem;
+    font-size: var(--font-size-base);
+  }
+  
+  &.badge-donor {
+    background-color: rgba(22, 163, 74, 0.1);
+    color: var(--color-donor);
+  }
+  
+  &.badge-receiver {
+    background-color: rgba(2, 132, 199, 0.1);
+    color: var(--color-receiver);
+  }
+  
+  &.badge-volunteer {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: var(--color-volunteer);
+  }
+  
+  &.badge-admin {
+    background-color: rgba(124, 58, 237, 0.1);
+    color: var(--color-admin);
+  }
+  
+  &.badge-default {
+    background-color: rgba(100, 116, 139, 0.1);
+    color: var(--color-gray-600);
+  }
+}
+

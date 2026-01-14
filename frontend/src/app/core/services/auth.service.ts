@@ -89,7 +89,7 @@ export class AuthService {
     return null; // Token is in httpOnly cookie
   }
 
-  private setUser(user: User): void {
+  setUser(user: User): void {
     this.currentUserSubject.next(user);
     localStorage.setItem('user', JSON.stringify(user));
   }

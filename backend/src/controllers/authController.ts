@@ -20,17 +20,18 @@ const signup = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       role,
-      provider
+      provider,
+      location: {
+        type: "Point",
+        coordinates: [0, 0] // Default coordinates, can be updated later
+      }
     });
-    res.status(200).json({
-            _id: user._id,
-            name: user.name,
-            email: user.email,
-            role: user.role,
-            provider: user.provider
-      });
     console.log("user", user);
-    return res.status(201).json({message: "User created successfully"});
+    
+    // Don't generate token - user needs to login after signup
+    return res.status(201).json({
+      message: "User created successfully. Please login."
+    });
   } catch (error: any) {
     return res.status(500).json({message: "Internal server error", error: error.message});
   }

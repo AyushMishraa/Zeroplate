@@ -1,0 +1,195 @@
+<div class="add-food-container">
+  <!-- Animated Background Particles -->
+  <div class="particles-container">
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+    <div class="particle particle-5"></div>
+  </div>
+
+  <!-- Vector Art Decorations -->
+  <div class="vector-arts">
+    <div class="vector-art vector-1">
+      <svg viewBox="0 0 200 200" class="food-basket-icon">
+        <path d="M50,180 L150,180 L160,60 L40,60 Z" fill="rgba(34, 197, 94, 0.1)" stroke="rgba(34, 197, 94, 0.3)" stroke-width="2"/>
+        <ellipse cx="100" cy="80" rx="40" ry="20" fill="rgba(22, 163, 74, 0.15)"/>
+        <circle cx="80" cy="120" r="8" fill="rgba(34, 197, 94, 0.2)"/>
+        <circle cx="120" cy="120" r="8" fill="rgba(34, 197, 94, 0.2)"/>
+      </svg>
+    </div>
+    <div class="vector-art vector-2">
+      <svg viewBox="0 0 200 200" class="apple-icon">
+        <path d="M100,30 Q120,20 130,40 Q140,60 120,70 Q100,80 80,70 Q60,60 70,40 Q80,20 100,30 Z" fill="rgba(239, 68, 68, 0.1)" stroke="rgba(239, 68, 68, 0.3)" stroke-width="2"/>
+        <path d="M100,30 L100,10" stroke="rgba(34, 197, 94, 0.3)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-brand" (click)="router.navigate(['/home'])" style="cursor: pointer;">
+        <mat-icon class="brand-icon">restaurant_menu</mat-icon>
+        <span class="brand-text">ZeroPlate</span>
+      </div>
+      
+      <div class="navbar-actions">
+        @if (currentUser) {
+          <div class="user-info">
+            <div class="user-details">
+              <p class="user-name">{{ currentUser.name }}</p>
+              <span [class]="'role-badge ' + getRoleBadgeColor(currentUser.role)">
+                {{ getRoleLabel(currentUser.role) }}
+              </span>
+            </div>
+            <button 
+              mat-icon-button 
+              [matMenuTriggerFor]="userMenu"
+              class="user-menu-button">
+              <mat-icon>account_circle</mat-icon>
+            </button>
+            <mat-menu #userMenu="matMenu" class="user-menu">
+              <button mat-menu-item (click)="router.navigate(['/home'])" class="menu-item">
+                <mat-icon>home</mat-icon>
+                <span>Home</span>
+              </button>
+              <button mat-menu-item (click)="router.navigate(['/browse-food'])" class="menu-item">
+                <mat-icon>search</mat-icon>
+                <span>Browse Food</span>
+              </button>
+              <button mat-menu-item (click)="logout()" class="menu-item">
+                <mat-icon>logout</mat-icon>
+                <span>Logout</span>
+              </button>
+            </mat-menu>
+          </div>
+        }
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <div class="form-container">
+      <!-- Header Section -->
+      <div class="header-section">
+        <div class="header-icon-wrapper">
+          <mat-icon class="header-icon">add_circle</mat-icon>
+        </div>
+        <h1 class="page-title">List Surplus Food</h1>
+        <p class="page-subtitle">Help reduce food waste by sharing your surplus food with those in need</p>
+      </div>
+
+      <!-- Form Card -->
+      <mat-card class="form-card">
+        <mat-card-content class="form-content">
+          <form [formGroup]="addFoodForm" (ngSubmit)="onSubmit()">
+            <div class="form-grid">
+              <!-- Food Name -->
+              <div class="form-field-wrapper">
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Food Name</mat-label>
+                  <input matInput formControlName="foodName" placeholder="e.g., Fresh Apples, Bread Loaves">
+                  <mat-icon matPrefix>restaurant</mat-icon>
+                  @if (addFoodForm.get('foodName')?.invalid && addFoodForm.get('foodName')?.touched) {
+                    <mat-error>{{ getErrorMessage('foodName') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <!-- Category -->
+              <div class="form-field-wrapper">
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Category</mat-label>
+                  <mat-select formControlName="category">
+                    <mat-option value="">Select Category</mat-option>
+                    @for (category of foodCategories; track category) {
+                      <mat-option [value]="category">{{ category }}</mat-option>
+                    }
+                  </mat-select>
+                  <mat-icon matPrefix>category</mat-icon>
+                  @if (addFoodForm.get('category')?.invalid && addFoodForm.get('category')?.touched) {
+                    <mat-error>{{ getErrorMessage('category') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <!-- Quantity -->
+              <div class="form-field-wrapper">
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Quantity</mat-label>
+                  <input matInput type="number" formControlName="quantity" placeholder="e.g., 10">
+                  <mat-icon matPrefix>scale</mat-icon>
+                  <mat-hint>Enter quantity in kg</mat-hint>
+                  @if (addFoodForm.get('quantity')?.invalid && addFoodForm.get('quantity')?.touched) {
+                    <mat-error>{{ getErrorMessage('quantity') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <!-- Expiry Date -->
+              <div class="form-field-wrapper">
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Expiry Date</mat-label>
+                  <input matInput [matDatepicker]="picker" formControlName="expiryDate" placeholder="Select expiry date">
+                  <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+                  <mat-datepicker #picker></mat-datepicker>
+                  <mat-icon matPrefix>event</mat-icon>
+                  @if (addFoodForm.get('expiryDate')?.invalid && addFoodForm.get('expiryDate')?.touched) {
+                    <mat-error>{{ getErrorMessage('expiryDate') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+
+              <!-- Location -->
+              <div class="form-field-wrapper full-width-field">
+                <mat-form-field appearance="fill" class="full-width">
+                  <mat-label>Pickup Location/Address</mat-label>
+                  <input matInput formControlName="location" placeholder="e.g., 123 Main St, City, State">
+                  <mat-icon matPrefix>location_on</mat-icon>
+                  @if (addFoodForm.get('location')?.invalid && addFoodForm.get('location')?.touched) {
+                    <mat-error>{{ getErrorMessage('location') }}</mat-error>
+                  }
+                </mat-form-field>
+              </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="submit-section">
+              <button 
+                mat-raised-button 
+                type="submit"
+                class="submit-button"
+                [disabled]="isLoading || addFoodForm.invalid">
+                @if (isLoading) {
+                  <span class="button-content">
+                    <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Creating Listing...
+                  </span>
+                } @else {
+                  <span class="button-content">
+                    <mat-icon>add_circle</mat-icon>
+                    <span>List Food</span>
+                  </span>
+                }
+              </button>
+            </div>
+          </form>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+

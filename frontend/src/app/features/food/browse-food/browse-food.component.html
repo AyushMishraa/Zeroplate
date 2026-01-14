@@ -1,0 +1,239 @@
+<div class="browse-food-container">
+  <!-- Animated Background Particles -->
+  <div class="particles-container">
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+    <div class="particle particle-5"></div>
+  </div>
+
+  <!-- Vector Art Decorations -->
+  <div class="vector-arts">
+    <div class="vector-art vector-1">
+      <svg viewBox="0 0 200 200" class="search-icon">
+        <circle cx="100" cy="100" r="60" fill="rgba(37, 99, 235, 0.1)" stroke="rgba(37, 99, 235, 0.3)" stroke-width="2"/>
+        <path d="M140,140 L180,180" stroke="rgba(37, 99, 235, 0.3)" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="vector-art vector-2">
+      <svg viewBox="0 0 200 200" class="food-icon">
+        <rect x="60" y="80" width="80" height="80" rx="10" fill="rgba(34, 197, 94, 0.1)" stroke="rgba(34, 197, 94, 0.3)" stroke-width="2"/>
+        <circle cx="100" cy="120" r="15" fill="rgba(22, 163, 74, 0.15)"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Navigation Bar -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-brand" (click)="router.navigate(['/home'])" style="cursor: pointer;">
+        <mat-icon class="brand-icon">restaurant_menu</mat-icon>
+        <span class="brand-text">ZeroPlate</span>
+      </div>
+      
+      <div class="navbar-actions">
+        @if (currentUser) {
+          <div class="user-info">
+            <div class="user-details">
+              <p class="user-name">{{ currentUser.name }}</p>
+              <span [class]="'role-badge ' + getRoleBadgeColor(currentUser.role)">
+                {{ getRoleLabel(currentUser.role) }}
+              </span>
+            </div>
+            <button 
+              mat-icon-button 
+              [matMenuTriggerFor]="userMenu"
+              class="user-menu-button">
+              <mat-icon>account_circle</mat-icon>
+            </button>
+            <mat-menu #userMenu="matMenu" class="user-menu">
+              <button mat-menu-item (click)="router.navigate(['/home'])" class="menu-item">
+                <mat-icon>home</mat-icon>
+                <span>Home</span>
+              </button>
+              <button mat-menu-item (click)="router.navigate(['/add-food'])" class="menu-item">
+                <mat-icon>add_circle</mat-icon>
+                <span>List Food</span>
+              </button>
+              <button mat-menu-item (click)="logout()" class="menu-item">
+                <mat-icon>logout</mat-icon>
+                <span>Logout</span>
+              </button>
+            </mat-menu>
+          </div>
+        }
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <!-- Header Section -->
+    <div class="header-section">
+      <div class="header-icon-wrapper">
+        <mat-icon class="header-icon">search</mat-icon>
+      </div>
+      <h1 class="page-title">Browse Available Food</h1>
+      <p class="page-subtitle">Find surplus food from donors in your area and help reduce waste</p>
+    </div>
+
+    <!-- Filters Section -->
+    <mat-card class="filters-card">
+      <mat-card-content class="filters-content">
+        <div class="filters-grid">
+          <!-- Search -->
+          <div class="filter-field">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Search Food</mat-label>
+              <input matInput [(ngModel)]="searchQuery" (input)="onSearch()" placeholder="Search by name, description, location...">
+              <mat-icon matPrefix>search</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Category Filter -->
+          <div class="filter-field">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Category</mat-label>
+              <mat-select [(ngModel)]="selectedCategory" (selectionChange)="onCategoryChange()">
+                @for (category of categories; track category) {
+                  <mat-option [value]="category">{{ category }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>category</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <!-- Sort -->
+          <div class="filter-field">
+            <mat-form-field appearance="fill" class="full-width">
+              <mat-label>Sort By</mat-label>
+              <mat-select [(ngModel)]="selectedSort" (selectionChange)="onSortChange()">
+                @for (option of sortOptions; track option.value) {
+                  <mat-option [value]="option.value">{{ option.label }}</mat-option>
+                }
+              </mat-select>
+              <mat-icon matPrefix>sort</mat-icon>
+            </mat-form-field>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Results Count -->
+    <div class="results-header">
+      <p class="results-count">
+        @if (isLoading) {
+          <span>Loading...</span>
+        } @else {
+          <span>Found {{ filteredItems.length }} food {{ filteredItems.length === 1 ? 'item' : 'items' }}</span>
+        }
+      </p>
+    </div>
+
+    <!-- Food Items Grid -->
+    @if (isLoading) {
+      <div class="loading-container">
+        <div class="spinner-wrapper">
+          <svg class="spinner" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+          </svg>
+          <p>Loading food items...</p>
+        </div>
+      </div>
+    } @else if (filteredItems.length === 0) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">inbox</mat-icon>
+        <h3>No food items found</h3>
+        <p>Try adjusting your search or filters</p>
+        <button mat-raised-button (click)="searchQuery = ''; selectedCategory = ''; applyFilters()" class="clear-filters-btn">
+          <mat-icon>refresh</mat-icon>
+          <span>Clear Filters</span>
+        </button>
+      </div>
+    } @else {
+      <div class="food-items-grid">
+        @for (item of filteredItems; track item.id; let i = $index) {
+          @if (item.status === 'available') {
+          <mat-card class="food-item-card" [style.animation-delay]="(i * 0.1) + 's'">
+            <mat-card-content class="food-item-content">
+              <!-- Card Header -->
+              <div class="food-item-header">
+                <div class="food-item-title-section">
+                  <h3 class="food-item-name">{{ item.foodName }}</h3>
+                  <span [class]="'category-chip ' + getCategoryColor(item.category)">
+                    {{ item.category }}
+                  </span>
+                </div>
+                @if (item.distance) {
+                  <div class="distance-badge">
+                    <mat-icon>location_on</mat-icon>
+                    <span>{{ item.distance }} km</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Food Details -->
+              <div class="food-item-details">
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">scale</mat-icon>
+                  <span class="detail-label">Quantity:</span>
+                  <span class="detail-value">{{ item.quantity }} {{ item.unit }}</span>
+                </div>
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">event</mat-icon>
+                  <span class="detail-label">Expiry:</span>
+                  <span class="detail-value">{{ item.expiryDate }}</span>
+                </div>
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">schedule</mat-icon>
+                  <span class="detail-label">Pickup Time:</span>
+                  <span class="detail-value">{{ item.pickupTime }}</span>
+                </div>
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">location_on</mat-icon>
+                  <span class="detail-label">Location:</span>
+                  <span class="detail-value">{{ item.location }}</span>
+                </div>
+                <div class="detail-row">
+                  <mat-icon class="detail-icon">store</mat-icon>
+                  <span class="detail-label">Donor:</span>
+                  <span class="detail-value">{{ item.donorName }}</span>
+                </div>
+              </div>
+
+              <!-- Description -->
+              <p class="food-item-description">{{ item.description }}</p>
+
+              <!-- Action Buttons -->
+              <div class="food-item-actions">
+                @if (currentUser?.role === 'receiver') {
+                  <button mat-stroked-button class="contact-btn" (click)="requestFood(item)">
+                    <mat-icon>shopping_cart</mat-icon>
+                    <span>Claim Food</span>
+                  </button>
+                } @else {
+                  <button mat-stroked-button class="contact-btn" disabled>
+                    <mat-icon>info</mat-icon>
+                    <span>Available</span>
+                  </button>
+                }
+              </div>
+            </mat-card-content>
+          </mat-card>
+          }
+        }
+      </div>
+    }
+  </div>
+</div>
+
+
+
+
+
+
+
+
+

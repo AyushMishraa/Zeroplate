@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule, NavigationEnd } from '@angular/router';
+import { filter } from 'rxjs/operators';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDividerModule } from '@angular/material/divider';
 import { AuthService, User } from '../../core/services/auth.service';
 
 @Component({
@@ -20,7 +24,10 @@ import { AuthService, User } from '../../core/services/auth.service';
     MatIconModule,
     MatToolbarModule,
     MatMenuModule,
-    MatChipsModule
+    MatChipsModule,
+    MatSnackBarModule,
+    MatDialogModule,
+    MatDividerModule
   ],
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
@@ -61,14 +68,138 @@ export class HomeComponent implements OnInit {
     }
   ];
 
-  constructor(public authService: AuthService) {}
+  testimonials = [
+    {
+      name: 'Sarah Johnson',
+      role: 'Restaurant Owner',
+      organization: 'Green Bites Cafe',
+      image: '👩‍🍳',
+      text: 'ZeroPlate has transformed how we handle surplus food. We\'ve reduced waste by 80% and helped feed over 500 families in our community.',
+      rating: 5
+    },
+    {
+      name: 'Michael Chen',
+      role: 'NGO Director',
+      organization: 'Community Food Bank',
+      image: '👨‍💼',
+      text: 'The platform makes it incredibly easy to connect with donors. We\'ve received fresh, quality food that directly benefits those in need.',
+      rating: 5
+    },
+    {
+      name: 'Emily Rodriguez',
+      role: 'Supermarket Manager',
+      organization: 'FreshMart Stores',
+      image: '👩‍💼',
+      text: 'ZeroPlate is a game-changer! We can now redirect surplus inventory to those who need it most, creating a positive impact every day.',
+      rating: 5
+    },
+    {
+      name: 'David Thompson',
+      role: 'Volunteer Coordinator',
+      organization: 'Hope Foundation',
+      image: '👨‍🎓',
+      text: 'The real-time matching feature is brilliant. We can quickly find and collect food donations, ensuring nothing goes to waste.',
+      rating: 5
+    }
+  ];
+
+  currentRoute: string = '';
+
+  constructor(
+    public authService: AuthService,
+    public router: Router,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
+  ) {}
 
   ngOnInit(): void {
     this.currentUser = this.authService.getCurrentUser();
+    this.currentRoute = this.router.url;
+    
+    // Subscribe to user changes
+    this.authService.currentUser$.subscribe(user => {
+      this.currentUser = user;
+    });
+    
+    // Subscribe to route changes
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        this.currentRoute = event.url;
+      });
   }
 
   logout(): void {
     this.authService.logout();
+    this.snackBar.open('Logged out successfully', 'Close', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top'
+    });
+  }
+
+  // Check if user is authenticated, if not prompt for login/signup
+  handleAction(action: string): void {
+    if (!this.authService.isAuthenticated()) {
+      this.promptAuth(action);
+    } else {
+      // User is authenticated, navigate to appropriate page
+      if (action === 'list-food') {
+        this.router.navigate(['/add-food']);
+      } else if (action === 'browse-food') {
+        this.router.navigate(['/browse-food']);
+      } else {
+        this.performAction(action);
+      }
+    }
+  }
+
+  promptAuth(action: string): void {
+    const message = `Please ${action === 'signup' ? 'sign up' : 'log in'} to ${this.getActionDescription(action)}`;
+    this.snackBar.open(message, 'Close', {
+      duration: 4000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top',
+      panelClass: ['info-snackbar']
+    });
+    
+    // Navigate to appropriate page
+    setTimeout(() => {
+      if (action === 'signup') {
+        this.router.navigate(['/signup']);
+      } else {
+        this.router.navigate(['/login']);
+      }
+    }, 500);
+  }
+
+  getActionDescription(action: string): string {
+    const descriptions: { [key: string]: string } = {
+      'list-food': 'list your surplus food',
+      'browse-food': 'browse available food',
+      'get-started': 'get started',
+      'track-impact': 'track your impact',
+      'join-network': 'join our network'
+    };
+    return descriptions[action] || 'continue';
+  }
+
+  performAction(action: string): void {
+    // Here you would implement the actual functionality
+    // For now, just show a success message
+    this.snackBar.open(`${this.getActionDescription(action)} feature coming soon!`, 'Close', {
+      duration: 3000,
+      horizontalPosition: 'center',
+      verticalPosition: 'top'
+    });
+  }
+
+  navigateToLogin(): void {
+    this.router.navigate(['/login']);
+  }
+
+  navigateToSignup(): void {
+    this.router.navigate(['/signup']);
   }
 
   getRoleBadgeColor(role: string): string {
@@ -97,4 +228,3 @@ export class HomeComponent implements OnInit {
     }
   }
 }
-

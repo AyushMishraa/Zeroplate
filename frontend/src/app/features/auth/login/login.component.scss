@@ -1,13 +1,415 @@
-::ng-deep .mat-mdc-form-field {
+// Premium Login Component Styles
+.auth-container {
+  position: relative;
+  min-height: 100vh;
+  overflow: hidden;
+  background: var(--primary-gradient);
+  background-size: 400% 400%;
+  animation: gradientShift 15s ease infinite;
+}
+
+// Animated Background Particles (Google-style)
+.particles-container {
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
 }
 
-::ng-deep .mat-mdc-text-field-wrapper {
-  background-color: white;
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(2px);
+  pointer-events: none;
 }
 
-::ng-deep .error-snackbar {
-  background-color: #f44336 !important;
-  color: white !important;
+.particle-1 {
+  width: 80px;
+  height: 80px;
+  top: 20%;
+  left: 10%;
+  animation: particleFloat1 20s ease-in-out infinite;
 }
 
+.particle-2 {
+  width: 120px;
+  height: 120px;
+  top: 60%;
+  right: 15%;
+  animation: particleFloat2 25s ease-in-out infinite;
+}
+
+.particle-3 {
+  width: 60px;
+  height: 60px;
+  bottom: 20%;
+  left: 20%;
+  animation: particleFloat3 18s ease-in-out infinite;
+}
+
+.particle-4 {
+  width: 100px;
+  height: 100px;
+  top: 40%;
+  right: 30%;
+  animation: particleFloat1 22s ease-in-out infinite;
+  animation-delay: -5s;
+}
+
+.particle-5 {
+  width: 70px;
+  height: 70px;
+  bottom: 30%;
+  right: 10%;
+  animation: particleFloat2 20s ease-in-out infinite;
+  animation-delay: -8s;
+}
+
+.particle-6 {
+  width: 90px;
+  height: 90px;
+  top: 10%;
+  right: 50%;
+  animation: particleFloat3 24s ease-in-out infinite;
+  animation-delay: -12s;
+}
+
+// Content Container
+.content-wrapper {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  box-sizing: border-box;
+  
+  @media (min-width: 640px) {
+    padding: 1.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    padding: 2rem;
+  }
+}
+
+// Brand Section
+.brand-section {
+  text-align: center;
+  margin-bottom: 2rem;
+  animation: fadeInDown 0.8s ease-out;
+  
+  @media (min-width: 768px) {
+    margin-bottom: 3rem;
+  }
+}
+
+.brand-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2rem;
+  font-weight: 800;
+  color: white;
+  text-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  @media (min-width: 640px) {
+    font-size: 2.5rem;
+  }
+  
+  @media (min-width: 768px) {
+    font-size: 3rem;
+  }
+  
+  @media (min-width: 1024px) {
+    font-size: 3.5rem;
+  }
+}
+
+.brand-subtitle {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-weight: 400;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.01em;
+  
+  @media (min-width: 640px) {
+    font-size: 1rem;
+  }
+  
+  @media (min-width: 768px) {
+    font-size: 1.125rem;
+  }
+  
+  @media (min-width: 1024px) {
+    font-size: 1.25rem;
+  }
+}
+
+// Card Container
+.card-container {
+  width: 100%;
+  max-width: 440px;
+  margin: 0 auto;
+  animation: fadeInUp 0.8s ease-out 0.2s both;
+  box-sizing: border-box;
+}
+
+// Form Styles
+.form-container {
+  padding: 1.5rem;
+  box-sizing: border-box;
+  
+  @media (min-width: 640px) {
+    padding: 2rem;
+  }
+  
+  @media (min-width: 768px) {
+    padding: 2.5rem;
+  }
+}
+
+.form-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin-bottom: 0.5rem;
+  text-align: center;
+  letter-spacing: -0.02em;
+  
+  @media (min-width: 640px) {
+    font-size: 1.75rem;
+  }
+  
+  @media (min-width: 768px) {
+    font-size: 2rem;
+  }
+}
+
+.form-subtitle {
+  color: var(--color-gray-500);
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 0.875rem;
+  font-weight: 400;
+  
+  @media (min-width: 640px) {
+    font-size: 0.9375rem;
+    margin-bottom: 1.75rem;
+  }
+  
+  @media (min-width: 768px) {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+}
+
+// Form Fields
+.form-field-wrapper {
+  margin-bottom: 1.25rem;
+  animation: fadeInUp 0.6s ease-out;
+  animation-fill-mode: both;
+  
+  @media (min-width: 768px) {
+    margin-bottom: 1.5rem;
+  }
+  
+  &:nth-child(1) {
+    animation-delay: 0.3s;
+  }
+  
+  &:nth-child(2) {
+    animation-delay: 0.4s;
+  }
+}
+
+// Premium Submit Button
+.submit-button {
+  width: 100%;
+  padding: 14px 16px;
+  margin-top: 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  border-radius: var(--radius-md);
+  background: var(--primary-gradient);
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-soft);
+  animation: fadeInUp 0.6s ease-out 0.5s both;
+  box-sizing: border-box;
+  
+  @media (min-width: 768px) {
+    padding: 16px;
+    font-size: 1.1rem;
+    margin-top: 1rem;
+  }
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+  }
+  
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+  }
+}
+
+// Link Section
+.link-section {
+  text-align: center;
+  margin-top: 1.25rem;
+  animation: fadeIn 0.6s ease-out 0.6s both;
+  
+  @media (min-width: 768px) {
+    margin-top: 1.5rem;
+  }
+  
+    p {
+    color: var(--color-gray-500);
+    font-size: 0.875rem;
+    
+    @media (min-width: 640px) {
+      font-size: 0.9375rem;
+    }
+    
+    @media (min-width: 768px) {
+      font-size: 0.95rem;
+    }
+    
+    a {
+      color: var(--color-royal-blue);
+      font-weight: 600;
+      text-decoration: none;
+      transition: all var(--transition-base);
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background: var(--primary-gradient);
+        transition: width var(--transition-base);
+      }
+      
+      &:hover {
+        color: var(--color-navy);
+        
+        &::after {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+// Divider
+.divider {
+  position: relative;
+  margin: 1.5rem 0;
+  text-align: center;
+  animation: fadeIn 0.6s ease-out 0.7s both;
+  
+  @media (min-width: 768px) {
+    margin: 2rem 0;
+  }
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, #e2e8f0, transparent);
+  }
+  
+  span {
+    position: relative;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 0 0.75rem;
+    color: #94a3b8;
+    font-size: 0.8125rem;
+    
+    @media (min-width: 640px) {
+      padding: 0 1rem;
+      font-size: 0.875rem;
+    }
+  }
+}
+
+// Premium Google Button
+.google-button {
+  width: 100%;
+  padding: 12px 14px;
+  margin-top: 0.75rem;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--color-gray-200);
+  background: white;
+  color: var(--color-gray-900);
+  font-weight: 600;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  animation: fadeInUp 0.6s ease-out 0.8s both;
+  box-sizing: border-box;
+  
+  @media (min-width: 768px) {
+    padding: 14px;
+    font-size: 1rem;
+    margin-top: 1rem;
+  }
+  
+  &:hover {
+    border-color: var(--color-royal-blue);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-xs);
+  }
+  
+  mat-icon {
+    color: #4285f4;
+    font-size: 1.25rem;
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+// Loading State
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255, 255, 255, 0.9);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  border-radius: 24px;
+  backdrop-filter: blur(4px);
+}

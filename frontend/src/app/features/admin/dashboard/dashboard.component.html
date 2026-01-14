@@ -1,0 +1,76 @@
+<div class="admin-dashboard-container">
+  <!-- Navigation Bar -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-brand" routerLink="/home" style="cursor: pointer;">
+        <mat-icon class="brand-icon">restaurant_menu</mat-icon>
+        <span class="brand-text">ZeroPlate Admin</span>
+      </div>
+      
+      <div class="navbar-actions">
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item routerLink="/home">
+            <mat-icon>home</mat-icon>
+            <span>Home</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <div class="dashboard-header">
+      <h1 class="page-title">Admin Dashboard</h1>
+      <p class="page-subtitle">Manage platform operations and monitor activity</p>
+    </div>
+
+    @if (isLoading) {
+      <app-loading message="Loading dashboard data..."></app-loading>
+    } @else {
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        @for (stat of stats; track stat.label) {
+          <app-stat-card
+            [value]="stat.value"
+            [label]="stat.label"
+            [icon]="stat.icon"
+            [color]="stat.color">
+          </app-stat-card>
+        }
+      </div>
+
+      <!-- Dashboard Tabs -->
+      <mat-tab-group class="dashboard-tabs">
+        <mat-tab label="Users">
+          <div class="tab-content">
+            <p>User management interface coming soon...</p>
+          </div>
+        </mat-tab>
+        <mat-tab label="Food Items">
+          <div class="tab-content">
+            <p>Food management interface coming soon...</p>
+          </div>
+        </mat-tab>
+        <mat-tab label="Claims">
+          <div class="tab-content">
+            <p>Claims management interface coming soon...</p>
+          </div>
+        </mat-tab>
+        <mat-tab label="Analytics">
+          <div class="tab-content">
+            <p>Analytics dashboard coming soon...</p>
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+    }
+  </div>
+</div>
+
