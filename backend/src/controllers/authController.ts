@@ -60,7 +60,8 @@ const login = async (req: Request, res: Response) => {
       name: user.name,
       email: user.email,
       role: user.role,
-      provider: user.provider
+      provider: user.provider,
+      token: token,
     }
     });
   } catch (error: any) {
