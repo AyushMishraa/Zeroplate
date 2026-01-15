@@ -1,0 +1,62 @@
+.profile-container {
+  min-height: 100vh;
+  background: var(--color-gray-50);
+}
+
+.navbar {
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-soft);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.navbar-content {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.content-wrapper {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: var(--spacing-8) var(--spacing-4);
+}
+
+.profile-header {
+  text-align: center;
+  margin-bottom: var(--spacing-12);
+}
+
+.page-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--color-gray-900);
+  margin-bottom: var(--spacing-2);
+}
+
+.page-subtitle {
+  font-size: 1.125rem;
+  color: var(--color-gray-500);
+}
+
+.profile-tabs {
+  background: white;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: var(--spacing-4);
+}
+
+.tab-content {
+  padding: var(--spacing-8);
+  min-height: 400px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: var(--spacing-4);
+}
+

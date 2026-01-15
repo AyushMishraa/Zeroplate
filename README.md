@@ -129,16 +129,14 @@ npm install
 Create a `.env` file in the `backend` directory with the following variables:
 
 ```env
-PORT=3000
+PORT=5000
 MONGODB_URI=your_mongodb_connection_string
-REDIS_URL=your_redis_connection_string
 JWT_SECRET=your_jwt_secret_key
 GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 GOOGLE_CLIENT_ID=your_google_oauth_client_id
 GOOGLE_CLIENT_SECRET=your_google_oauth_client_secret
-GMAIL_USER=your_gmail_address
-GMAIL_PASSWORD=your_gmail_app_password
-NODE_ENV=development
+EMAIL_USER=your_gmail_address
+EMAIL_PASSWORD=your_gmail_app_password
 ```
 
 ### Step 3: Start the Backend Server
@@ -312,14 +310,14 @@ The application uses cookie-based authentication:
 
 ### Port Already in Use
 
-**For Backend (Port 3000):**
+**For Backend (Port 5000):**
 ```bash
 # Windows
-netstat -ano | findstr :3000
+netstat -ano | findstr :5000
 taskkill /PID <PID> /F
 
 # macOS/Linux
-lsof -i :3000
+lsof -i :5000
 kill -9 <PID>
 ```
 

@@ -1,0 +1,68 @@
+<div class="volunteer-dashboard-container">
+  <!-- Navigation Bar -->
+  <mat-toolbar class="navbar">
+    <div class="navbar-content">
+      <div class="navbar-brand" routerLink="/home" style="cursor: pointer;">
+        <mat-icon class="brand-icon">restaurant_menu</mat-icon>
+        <span class="brand-text">ZeroPlate Volunteer</span>
+      </div>
+      
+      <div class="navbar-actions">
+        <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-menu-button">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item routerLink="/home">
+            <mat-icon>home</mat-icon>
+            <span>Home</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+  </mat-toolbar>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    <div class="dashboard-header">
+      <h1 class="page-title">Volunteer Dashboard</h1>
+      <p class="page-subtitle">Manage your assigned pickups and track your impact</p>
+    </div>
+
+    @if (isLoading) {
+      <app-loading message="Loading dashboard data..."></app-loading>
+    } @else {
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        @for (stat of stats; track stat.label) {
+          <app-stat-card
+            [value]="stat.value"
+            [label]="stat.label"
+            [icon]="stat.icon"
+            [color]="stat.color">
+          </app-stat-card>
+        }
+      </div>
+
+      <!-- Assigned Pickups -->
+      <mat-card class="pickups-card">
+        <mat-card-header>
+          <mat-card-title>Assigned Pickups</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          @if (assignedPickups.length === 0) {
+            <p>No pickups assigned at this time.</p>
+          } @else {
+            <div class="pickups-list">
+              <!-- Pickup items will be displayed here -->
+            </div>
+          }
+        </mat-card-content>
+      </mat-card>
+    }
+  </div>
+</div>
+

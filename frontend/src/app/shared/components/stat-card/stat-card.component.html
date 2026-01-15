@@ -1,0 +1,16 @@
+<mat-card class="stat-card" [class]="'stat-card-' + color">
+  <div class="stat-content">
+    <div class="stat-icon-wrapper" [class]="'icon-' + color">
+      <mat-icon class="stat-icon">{{ icon }}</mat-icon>
+    </div>
+    <h3 class="stat-value">{{ value }}</h3>
+    <p class="stat-label">{{ label }}</p>
+    @if (trend !== undefined) {
+      <div class="stat-trend" [class.positive]="trend >= 0" [class.negative]="trend < 0">
+        <mat-icon>{{ trend >= 0 ? 'trending_up' : 'trending_down' }}</mat-icon>
+        <span>{{ Math.abs(trend) }}%</span>
+      </div>
+    }
+  </div>
+</mat-card>
+

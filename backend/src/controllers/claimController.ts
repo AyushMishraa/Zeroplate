@@ -16,8 +16,8 @@ const createClaim = async (req: Request, res: Response) => {
             return res.status(404).json({message: "Food item is not available"});
         }
 
-        const existingClam = await ClaimModel.findOne({ food: foodID, receiver: receiverId});
-        if (!existingClam) {
+        const existingClaim = await ClaimModel.findOne({ food: foodID, receiver: receiverId});
+        if (existingClaim) {
             return res.status(400).json({message: "You already have a claim for this food item"});
         }
 
@@ -49,8 +49,8 @@ const createClaim = async (req: Request, res: Response) => {
 const getClaims = async(req:Request, res:Response) => {
     try {
          const receiverId = (req as any).user.id;
-         const claim = await ClaimModel.findOne({receiver: receiverId}).populate("food").populate("receiver", "name email");
-         res.status(200).json({success: true, claim});
+         const claims = await ClaimModel.find({receiver: receiverId}).populate("food").populate("receiver", "name email");
+         res.status(200).json({success: true, claims});
     } catch (error: any) {
         res.status(500).json({success: false, message: "Internal server error", error: error.message});
     }

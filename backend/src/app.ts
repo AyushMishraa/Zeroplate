@@ -13,6 +13,7 @@ import { Server } from "socket.io";
 import http from "http";
 import claimRoutes from "./routes/claimRoutes";
 import adminDashboardRoutes from "./routes/adminDashboardRoutes";
+import analyticsRoutes from "./routes/analyticsRoutes";
 import { errorHandler } from "./middlewares/errorMiddleware";
 
 dotenv.config();
@@ -24,7 +25,7 @@ const app = express();
 app.use(cors({
   origin: 'http://localhost:4200',
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
@@ -60,5 +61,6 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/foods", foodRoutes);
 app.use("/api/claims", claimRoutes);
 app.use("/api/admin", adminDashboardRoutes);
+app.use("/api/analytics", analyticsRoutes);
 
 export default app;

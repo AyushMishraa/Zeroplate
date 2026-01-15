@@ -1,0 +1,28 @@
+.empty-state {
+  text-align: center;
+  padding: var(--spacing-16) var(--spacing-4);
+  animation: fadeIn 0.6s ease-out;
+}
+
+.empty-icon {
+  font-size: 4rem !important;
+  width: 4rem !important;
+  height: 4rem !important;
+  color: var(--color-gray-400);
+  margin-bottom: var(--spacing-6);
+}
+
+.empty-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--color-gray-900);
+  margin-bottom: var(--spacing-2);
+}
+
+.empty-message {
+  color: var(--color-gray-500);
+  margin-bottom: var(--spacing-8);
+  font-size: var(--font-size-base);
+}
+

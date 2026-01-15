@@ -14,9 +14,221 @@ body {
   font-family: 'Inter', sans-serif;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   min-height: 100vh;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 html, body {
   height: 100%;
+}
+
+// ============================================
+// DARK MODE GLOBAL STYLES
+// ============================================
+
+html.dark-mode {
+  color-scheme: dark;
+
+  body {
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: #f1f5f9;
+  }
+
+  // Material theme overrides for dark mode
+  .mat-toolbar {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+  }
+
+  .mat-card {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+  }
+
+  .mat-mdc-button,
+  .mat-mdc-raised-button,
+  .mat-mdc-stroked-button {
+    &:not(.signup-btn) {
+      color: #cbd5e1 !important;
+
+      &:hover {
+        color: #a5b4fc !important;
+      }
+    }
+  }
+
+  .mat-mdc-input-element {
+    color: #f1f5f9 !important;
+
+    &::placeholder {
+      color: #64748b;
+    }
+  }
+
+  .mat-mdc-form-field-label {
+    color: #cbd5e1 !important;
+  }
+
+  .mat-mdc-select-panel {
+    background-color: #1e293b !important;
+  }
+
+  .mat-mdc-select-value {
+    color: #cbd5e1 !important;
+  }
+
+  .mat-mdc-option {
+    color: #cbd5e1 !important;
+
+    &:hover {
+      background-color: rgba(99, 102, 241, 0.15) !important;
+    }
+  }
+
+  .mat-mdc-menu-panel {
+    background-color: #1e293b !important;
+  }
+
+  .mat-mdc-menu-item {
+    color: #cbd5e1 !important;
+
+    &:hover {
+      background-color: rgba(99, 102, 241, 0.15) !important;
+    }
+  }
+
+  .mat-datepicker-content {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+  }
+
+  .mat-calendar {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+  }
+
+  .mat-calendar-body-cell {
+    color: #cbd5e1 !important;
+  }
+
+  .mat-calendar-body-today:not(.mat-calendar-body-selected) {
+    border-color: #4f46e5 !important;
+  }
+
+  .mat-divider {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .mat-tab-label {
+    color: #cbd5e1 !important;
+
+    &.mat-tab-label-active {
+      color: #a5b4fc !important;
+    }
+  }
+
+  .mat-tab-header-pagination-chevron {
+    border-color: #cbd5e1 !important;
+  }
+
+  .mat-slide-toggle {
+    &.mat-checked {
+      .mat-slide-toggle-thumb {
+        background-color: #818cf8 !important;
+      }
+
+      .mat-slide-toggle-bar {
+        background-color: rgba(129, 140, 248, 0.5) !important;
+      }
+    }
+  }
+
+  .mat-radio-button {
+    .mat-radio-inner-circle {
+      border-color: #cbd5e1 !important;
+    }
+
+    &.mat-radio-checked {
+      .mat-radio-inner-circle {
+        background-color: #818cf8 !important;
+      }
+    }
+  }
+
+  .mat-checkbox {
+    .mdc-checkbox__native-control:checked ~ .mdc-checkbox__background {
+      background-color: #818cf8 !important;
+    }
+  }
+
+  .mat-progress-bar {
+    background-color: rgba(99, 102, 241, 0.2) !important;
+
+    .mat-progress-bar-fill::after {
+      background-color: #818cf8 !important;
+    }
+  }
+
+  .mat-progress-spinner {
+    circle {
+      stroke: #818cf8 !important;
+    }
+  }
+
+  .mat-snack-bar-container {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+  }
+
+  .mat-dialog-container {
+    background-color: #1e293b !important;
+    color: #f1f5f9 !important;
+  }
+
+  .mat-table {
+    background-color: #0f172a !important;
+    color: #cbd5e1 !important;
+
+    .mat-header-cell {
+      color: #f1f5f9 !important;
+      background-color: rgba(30, 41, 59, 0.8) !important;
+    }
+
+    .mat-row {
+      border-color: rgba(255, 255, 255, 0.08) !important;
+
+      &:hover {
+        background-color: rgba(99, 102, 241, 0.08) !important;
+      }
+    }
+  }
+
+  // Scrollbar styles for dark mode
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+
+    &:hover {
+      background: #64748b;
+    }
+  }
+}
+
+// Smooth transitions for all theme-aware elements
+.mat-toolbar,
+.mat-card,
+.mat-button,
+.mat-raised-button,
+.mat-stroked-button,
+body {
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
