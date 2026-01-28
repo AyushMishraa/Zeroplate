@@ -15,15 +15,25 @@ passport.use(
         async (accessToken, refreshToken, profile, done) => {
             try {
                 let user = await User.findOne({googleId: profile.id});
+                let isNewUser = false;
+                
                 if (!user) {
+                    isNewUser = true;
                     user = await User.create({
                         name: profile.displayName,
                         email: profile.emails?.[0]?.value as string,
                         googleId: profile.id,
                         provider: "google",
-                        role: "receiver"
+                        role: "receiver",
+                        location: {
+                            type: "Point",
+                            coordinates: [0, 0]
+                        }
                     })
                 }
+                
+                // Attach isNewUser flag to user object for later use
+                (user as any).isNewUser = isNewUser;
                 return done(null, user);
             }
             catch( error ) {

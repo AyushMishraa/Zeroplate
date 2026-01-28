@@ -3,6 +3,7 @@ import { LoginComponent } from './features/auth/login/login.component';
 import { SignupComponent } from './features/auth/signup/signup.component';
 import { HomeComponent } from './features/home/home.component';
 import { GoogleCallbackComponent } from './features/auth/google-callback/google-callback.component';
+import { RoleSelectionComponent } from './features/auth/role-selection/role-selection.component';
 import { AddFoodComponent } from './features/food/add-food/add-food.component';
 import { BrowseFoodComponent } from './features/food/browse-food/browse-food.component';
 import { AdminDashboardComponent } from './features/admin/dashboard/dashboard.component';
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'login', component: LoginComponent },
   { path: 'signup', component: SignupComponent },
   { path: 'auth/google/callback', component: GoogleCallbackComponent },
+  { path: 'auth/role-selection', component: RoleSelectionComponent },
   { path: 'home', component: HomeComponent }, // Public home page
   { path: 'add-food', component: AddFoodComponent, canActivate: [authGuard] },
   { path: 'browse-food', component: BrowseFoodComponent, canActivate: [authGuard] },

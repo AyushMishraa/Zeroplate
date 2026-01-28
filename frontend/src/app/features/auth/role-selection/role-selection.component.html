@@ -1,0 +1,61 @@
+<div class="auth-container">
+  <!-- Animated Background Particles -->
+  <div class="particles-container">
+    <div class="particle particle-1"></div>
+    <div class="particle particle-2"></div>
+    <div class="particle particle-3"></div>
+    <div class="particle particle-4"></div>
+    <div class="particle particle-5"></div>
+    <div class="particle particle-6"></div>
+  </div>
+
+  <div class="content-wrapper">
+    <div class="card-container">
+      <!-- Brand Section -->
+      <div class="brand-section">
+        <h1 class="brand-title">ZeroPlate</h1>
+        <p class="brand-subtitle">Choose your role to get started</p>
+      </div>
+
+      <mat-card class="shadow-strong">
+        <mat-card-content class="form-container">
+          <h2 class="form-title">Welcome, {{ name }}!</h2>
+          <p class="form-subtitle">Select your role to begin your journey with us</p>
+
+          <div class="role-grid">
+            @for (role of roles; track role.value) {
+              <div 
+                class="role-card"
+                [class.selected]="selectedRole === role.value"
+                (click)="selectRole(role.value)">
+                <div class="role-card-content">
+                  <mat-icon class="role-icon">{{ role.icon }}</mat-icon>
+                  <h3 class="role-name">{{ role.label }}</h3>
+                  <p class="role-description">{{ role.description }}</p>
+                </div>
+              </div>
+            }
+          </div>
+
+          <button 
+            mat-raised-button 
+            class="confirm-button"
+            [disabled]="!selectedRole || isLoading"
+            (click)="confirmRole()">
+            @if (isLoading) {
+              <span class="flex items-center justify-center">
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                Confirming...
+              </span>
+            } @else {
+              Confirm Role
+            }
+          </button>
+        </mat-card-content>
+      </mat-card>
+    </div>
+  </div>
+</div>

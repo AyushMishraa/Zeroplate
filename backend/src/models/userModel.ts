@@ -13,6 +13,7 @@ export interface IUser extends mongoose.Document {
     type: string;
     coordinates: number[];
   }
+  isNewUser?: boolean;
 }
 
 const userSchema = new mongoose.Schema<IUser>(

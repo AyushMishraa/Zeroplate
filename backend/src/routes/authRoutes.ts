@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import passport from "../services/authService";
 import { generateToken } from "../utils/generateToken";
-import { signup, login } from "../controllers/authController";
+import { signup, login, updateUserRole } from "../controllers/authController";
 import { authLimiter } from "../middlewares/authMiddleware";
 import { IUser } from "../models/userModel";
 
@@ -11,6 +11,7 @@ const router = express.Router();
 
 router.post("/signup", authLimiter, signup);
 router.post("/login", authLimiter, login);
+router.put("/update-role", updateUserRole);
 
 router.get("/google", passport.authenticate("google", {scope: ["profile", "email"]}));
 
@@ -20,6 +21,10 @@ router.get(
   (req: Request, res: Response) => {
     console.log("req.user", req.user);
     const user = req.user as User;
+    
+    // Use the isNewUser flag set during passport authentication
+    const isNewUser = user.isNewUser || false;
+    
     const token = generateToken(user.email, user.role, user?._id?.toString());
     // Set token in httpOnly cookie
     res.cookie("token", token, {httpOnly: true, secure: true, sameSite: "strict"});
@@ -29,7 +34,8 @@ router.get(
       name: user.name,
       email: user.email,
       role: user.role,
-      provider: user.provider
+      provider: user.provider,
+      isNewUser: isNewUser
     }));
     res.redirect(`${process.env.FRONTEND_URL}/auth/google/callback?user=${userInfo}`);
   }

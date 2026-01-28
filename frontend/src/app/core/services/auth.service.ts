@@ -94,6 +94,20 @@ export class AuthService {
     localStorage.setItem('user', JSON.stringify(user));
   }
 
+  getUser(): User | null {
+    return this.currentUserSubject.value;
+  }
+
+  updateUserRole(userId: string, role: 'donor' | 'receiver'): Observable<AuthResponse> {
+    return this.http.put<AuthResponse>(`${this.apiUrl}/update-role`, { userId, role }, { withCredentials: true }).pipe(
+      tap(response => {
+        if (response.user) {
+          this.setUser(response.user);
+        }
+      })
+    );
+  }
+
   private loadUserFromStorage(): void {
     const userStr = localStorage.getItem('user');
     if (userStr) {

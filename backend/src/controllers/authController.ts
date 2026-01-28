@@ -69,4 +69,44 @@ const login = async (req: Request, res: Response) => {
   }
 }
 
-export { signup, login };
+const updateUserRole = async (req: Request, res: Response) => {
+  try {
+    const { userId, role } = req.body;
+    
+    if (!userId || !role) {
+      return res.status(400).json({message: "userId and role are required"});
+    }
+
+    if (!['donor', 'receiver', 'admin'].includes(role)) {
+      return res.status(400).json({message: "Invalid role"});
+    }
+
+    const user = await User.findByIdAndUpdate(
+      userId,
+      { role },
+      { new: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({message: "User not found"});
+    }
+
+    const token = generateToken(user.email, user.role, user.id);
+    res.cookie("token", token, {httpOnly: true, secure: true, sameSite: "strict"});
+
+    return res.status(200).json({
+      message: "Role updated successfully",
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        provider: user.provider
+      }
+    });
+  } catch (error: any) {
+    return res.status(500).json({message: "Internal server error", error: error.message});
+  }
+}
+
+export { signup, login, updateUserRole };
