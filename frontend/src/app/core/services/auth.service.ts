@@ -94,7 +94,6 @@ export class AuthService {
   }
 
   updateRole(role: 'donor' | 'receiver' | 'admin'): Observable<any> {
-    const userId = this.getUserId();
     return this.http.put(`${environment.apiUrl}/auth/update-role`, { role })
       .pipe(
         tap(() => {

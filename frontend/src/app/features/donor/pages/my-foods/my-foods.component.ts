@@ -1,18 +1,142 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FoodService } from '../../../../core/services/food.service';
 import { FoodItem } from '../../../../core/models';
 
+// ---- Edit Dialog Component ----
+@Component({
+  selector: 'app-edit-food-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatButtonModule,
+    MatIconModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatProgressSpinnerModule,
+    MatDialogModule
+  ],
+  template: `
+    <h2 mat-dialog-title>Edit Food Item</h2>
+    <mat-dialog-content>
+      <form [formGroup]="editForm" class="edit-form">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Food Title</mat-label>
+          <input matInput formControlName="title">
+          <mat-error *ngIf="editForm.get('title')?.hasError('required')">Title is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Food Type (Optional)</mat-label>
+          <input matInput formControlName="type" placeholder="e.g., Cooked, Raw, Packaged">
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Quantity (servings)</mat-label>
+          <input matInput type="number" formControlName="quantity">
+          <mat-error *ngIf="editForm.get('quantity')?.hasError('required')">Quantity is required</mat-error>
+          <mat-error *ngIf="editForm.get('quantity')?.hasError('min')">Must be at least 1</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Expiration Date</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="expirationDate" [min]="minDate">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+          <mat-error *ngIf="editForm.get('expirationDate')?.hasError('required')">Date is required</mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Pickup Address</mat-label>
+          <textarea matInput formControlName="pickupLocation" rows="2"></textarea>
+          <mat-error *ngIf="editForm.get('pickupLocation')?.hasError('required')">Location is required</mat-error>
+        </mat-form-field>
+      </form>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button (click)="onCancel()">Cancel</button>
+      <button mat-raised-button color="primary" (click)="onSave()" [disabled]="editForm.invalid || isSaving">
+        @if (isSaving) {
+          <mat-spinner diameter="20"></mat-spinner>
+        } @else {
+          Save Changes
+        }
+      </button>
+    </mat-dialog-actions>
+  `,
+  styles: [`
+    .edit-form { display: flex; flex-direction: column; gap: 8px; min-width: 400px; padding-top: 8px; }
+    .full-width { width: 100%; }
+    mat-dialog-content { max-height: 70vh; overflow-y: auto; }
+  `]
+})
+export class EditFoodDialogComponent {
+  editForm: FormGroup;
+  isSaving = false;
+  minDate = new Date();
+
+  constructor(
+    private fb: FormBuilder,
+    private foodService: FoodService,
+    private dialogRef: MatDialogRef<EditFoodDialogComponent>,
+    @Inject(MAT_DIALOG_DATA) public food: FoodItem
+  ) {
+    this.editForm = this.fb.group({
+      title: [food.title, Validators.required],
+      type: [food.type || ''],
+      quantity: [food.quantity, [Validators.required, Validators.min(1)]],
+      expirationDate: [new Date(food.expirationDate), Validators.required],
+      pickupLocation: [food.pickupLocation, Validators.required]
+    });
+  }
+
+  onCancel(): void {
+    this.dialogRef.close();
+  }
+
+  onSave(): void {
+    if (this.editForm.invalid) return;
+    this.isSaving = true;
+
+    const updates: Partial<FoodItem> = {
+      title: this.editForm.value.title,
+      type: this.editForm.value.type || undefined,
+      quantity: parseInt(this.editForm.value.quantity),
+      expirationDate: this.editForm.value.expirationDate,
+      pickupLocation: this.editForm.value.pickupLocation
+    };
+
+    this.foodService.updateFood(this.food._id, updates).subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.dialogRef.close(true);
+      },
+      error: () => {
+        this.isSaving = false;
+      }
+    });
+  }
+}
+
+// ---- Main Component ----
 @Component({
   selector: 'app-my-foods',
   standalone: true,
@@ -55,7 +179,6 @@ export class MyFoodsComponent implements OnInit {
       next: (response) => {
         const allFoods = Array.isArray(response.food) ? response.food : [];
 
-        // Filter user's foods
         this.allFoods = allFoods.filter(food => {
           const donorId = typeof food.donor === 'object' ? food.donor._id : food.donor;
           return donorId === userId;
@@ -64,8 +187,7 @@ export class MyFoodsComponent implements OnInit {
         this.applyFilter();
         this.isLoading = false;
       },
-      error: (error) => {
-        console.error('Failed to load foods:', error);
+      error: () => {
         this.isLoading = false;
         this.snackBar.open('Failed to load food items', 'Close', { duration: 3000 });
       }
@@ -105,8 +227,18 @@ export class MyFoodsComponent implements OnInit {
   }
 
   editFood(food: FoodItem): void {
-    // TODO: Implement edit functionality
-    this.snackBar.open('Edit functionality coming soon!', 'Close', { duration: 2000 });
+    const dialogRef = this.dialog.open(EditFoodDialogComponent, {
+      data: food,
+      width: '500px',
+      maxWidth: '95vw'
+    });
+
+    dialogRef.afterClosed().subscribe(saved => {
+      if (saved) {
+        this.snackBar.open('Food item updated successfully', 'Close', { duration: 3000 });
+        this.loadMyFoods();
+      }
+    });
   }
 
   deleteFood(food: FoodItem): void {
@@ -114,9 +246,9 @@ export class MyFoodsComponent implements OnInit {
       this.foodService.deleteFood(food._id).subscribe({
         next: () => {
           this.snackBar.open('Food item deleted successfully', 'Close', { duration: 3000 });
-          this.loadMyFoods(); // Reload the list
+          this.loadMyFoods();
         },
-        error: (error) => {
+        error: () => {
           this.snackBar.open('Failed to delete food item', 'Close', { duration: 3000 });
         }
       });

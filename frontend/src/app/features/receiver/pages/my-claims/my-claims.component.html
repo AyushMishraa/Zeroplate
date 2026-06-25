@@ -30,6 +30,9 @@
             <mat-chip [highlighted]="selectedFilter === 'completed'" (click)="filterBy('completed')">
                 Completed ({{ getClaimCountByStatus('completed') }})
             </mat-chip>
+            <mat-chip [highlighted]="selectedFilter === 'rejected'" (click)="filterBy('rejected')">
+                Rejected ({{ getClaimCountByStatus('rejected') }})
+            </mat-chip>
         </mat-chip-set>
     </div>
 

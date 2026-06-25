@@ -20,15 +20,11 @@
                 <mat-chip [highlighted]="selectedType === 'all'" (click)="filterByType('all')">
                     All
                 </mat-chip>
-                <mat-chip [highlighted]="selectedType === 'cooked'" (click)="filterByType('cooked')">
-                    Cooked
+                @for (type of availableTypes; track type) {
+                <mat-chip [highlighted]="selectedType === type" (click)="filterByType(type)">
+                    {{ type | titlecase }}
                 </mat-chip>
-                <mat-chip [highlighted]="selectedType === 'raw'" (click)="filterByType('raw')">
-                    Raw
-                </mat-chip>
-                <mat-chip [highlighted]="selectedType === 'packaged'" (click)="filterByType('packaged')">
-                    Packaged
-                </mat-chip>
+                }
             </mat-chip-set>
         </div>
     </mat-card>

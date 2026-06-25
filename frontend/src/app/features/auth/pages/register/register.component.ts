@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule, Router } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -45,7 +45,6 @@ export class RegisterComponent {
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router,
     private snackBar: MatSnackBar
   ) {
     this.accountForm = this.fb.group({
@@ -109,8 +108,8 @@ export class RegisterComponent {
       this.authService.register(registerData).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.snackBar.open('Registration successful!', 'Close', { duration: 3000 });
-          this.router.navigate(['/auth/login']);
+          this.snackBar.open('Registration successful! Welcome to ZeroPlate!', 'Close', { duration: 3000 });
+          this.authService.redirectAfterLogin();
         },
         error: (error) => {
           this.isLoading = false;

@@ -26,7 +26,9 @@ import { FoodItem } from '../../../../core/models';
   styleUrl: './dashboard.component.scss'
 })
 export class DonorDashboardComponent implements OnInit {
-  userName = this.authService.currentUser()?.name || 'Donor';
+  get userName(): string {
+    return this.authService.currentUser()?.name || 'Donor';
+  }
   isLoading = true;
 
   stats = {

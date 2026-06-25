@@ -9,84 +9,85 @@
 
 .login-card {
     width: 100%;
-    max-width: 450px;
-    padding: 48px 32px;
+    max-width: 440px;
+    padding: 40px 36px !important;
+    border-radius: 16px !important;
 }
 
 .logo {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    margin-bottom: 24px;
+    gap: 10px;
+    margin-bottom: 20px;
     color: #667eea;
 
     mat-icon {
-        font-size: 2.5rem;
-        width: 2.5rem;
-        height: 2.5rem;
+        font-size: 2.25rem;
+        width: 2.25rem;
+        height: 2.25rem;
     }
 
     h1 {
-        font-size: 2rem;
+        font-size: 1.875rem;
+        font-weight: 700;
         margin: 0;
     }
 }
 
 h2 {
     text-align: center;
-    margin: 0 0 8px;
-    font-size: 1.75rem;
+    margin: 0 0 6px;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #222;
 }
 
 .subtitle {
     text-align: center;
-    color: #666;
-    margin: 0 0 32px;
-}
-
-.full-width {
-    width: 100%;
+    color: #777;
+    margin: 0 0 28px;
+    font-size: 0.9rem;
 }
 
 mat-form-field {
-    margin-bottom: 16px;
+    display: block;
+    margin-bottom: 4px;
 }
 
 .submit-button {
     height: 48px;
     font-size: 1rem;
-    margin-top: 8px;
+    font-weight: 500;
+    margin-top: 12px;
+    border-radius: 8px !important;
 
     mat-spinner {
         margin: 0 auto;
     }
 }
 
+/* ── OR divider using flexbox ── */
 .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
     margin: 24px 0;
-    position: relative;
 
-    &::before {
+    &::before,
+    &::after {
         content: '';
-        position: absolute;
-        top: 50%;
-        left: 0;
-        right: 0;
+        flex: 1;
         height: 1px;
         background: #e0e0e0;
     }
 }
 
 .divider-text {
-    background: white;
-    padding: 0 16px;
-    position: relative;
+    font-size: 0.8rem;
     color: #999;
-    font-size: 0.875rem;
-    display: inline-block;
-    left: 50%;
-    transform: translateX(-50%);
+    font-weight: 500;
+    white-space: nowrap;
 }
 
 .google-button {
@@ -94,28 +95,44 @@ mat-form-field {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 12px;
-    font-size: 1rem;
+    gap: 10px;
+    font-size: 0.95rem;
+    border-radius: 8px !important;
+    border-color: #ddd !important;
 }
 
 .google-icon {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 .signup-link {
     text-align: center;
-    margin-top: 24px;
-    color: #666;
+    margin-top: 20px;
+    color: #777;
+    font-size: 0.9rem;
 
     a {
         color: #667eea;
         text-decoration: none;
-        font-weight: 500;
+        font-weight: 600;
         margin-left: 4px;
 
         &:hover {
             text-decoration: underline;
         }
+    }
+}
+
+@media (max-width: 480px) {
+    .login-container {
+        padding: 16px;
+        align-items: flex-start;
+        padding-top: 40px;
+    }
+
+    .login-card {
+        padding: 28px 20px !important;
     }
 }

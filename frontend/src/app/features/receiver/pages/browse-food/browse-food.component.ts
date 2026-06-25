@@ -38,6 +38,7 @@ export class BrowseFoodComponent implements OnInit {
   isClaimingFood: string | null = null;
   allFoods: FoodItem[] = [];
   filteredFoods: FoodItem[] = [];
+  availableTypes: string[] = [];
   searchQuery = '';
   selectedType = 'all';
 
@@ -55,6 +56,10 @@ export class BrowseFoodComponent implements OnInit {
     this.foodService.getAvailableFoods().subscribe({
       next: (response) => {
         this.allFoods = Array.isArray(response.food) ? response.food : [];
+        // Extract unique types for filter chips
+        this.availableTypes = [...new Set(
+          this.allFoods.map(f => f.type?.toLowerCase()).filter((t): t is string => !!t)
+        )];
         this.applyFilters();
         this.isLoading = false;
       },

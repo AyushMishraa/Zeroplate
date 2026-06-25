@@ -14,39 +14,46 @@
     <div class="loading-container">
         <mat-spinner diameter="60"></mat-spinner>
     </div>
+    } @else if (!fraudData) {
+    <mat-card class="error-card">
+        <mat-icon>error_outline</mat-icon>
+        <h2>Failed to Load Data</h2>
+        <p>Unable to retrieve fraud detection data. Please try again.</p>
+        <button mat-raised-button color="primary" (click)="loadFraudData()">Retry</button>
+    </mat-card>
     } @else {
     <!-- Alert Summary -->
     <div class="alerts-summary">
-        <mat-card class="alert-card" [class.has-alerts]="fraudData!.duplicateClaimsCount > 0">
+        <mat-card class="alert-card" [class.has-alerts]="fraudData.duplicateClaimsCount > 0">
             <div class="alert-header">
                 <mat-icon>content_copy</mat-icon>
                 <h3>Duplicate Claims</h3>
             </div>
-            <p class="alert-count">{{ fraudData!.duplicateClaimsCount }}</p>
+            <p class="alert-count">{{ fraudData.duplicateClaimsCount }}</p>
             <p class="alert-description">Users with duplicate claims detected</p>
         </mat-card>
 
-        <mat-card class="alert-card" [class.has-alerts]="fraudData!.rapidClaimUsersCount > 0">
+        <mat-card class="alert-card" [class.has-alerts]="fraudData.rapidClaimUsersCount > 0">
             <div class="alert-header">
                 <mat-icon>speed</mat-icon>
                 <h3>Rapid Claims</h3>
             </div>
-            <p class="alert-count">{{ fraudData!.rapidClaimUsersCount }}</p>
+            <p class="alert-count">{{ fraudData.rapidClaimUsersCount }}</p>
             <p class="alert-description">Users making rapid multiple claims</p>
         </mat-card>
 
-        <mat-card class="alert-card" [class.has-alerts]="fraudData!.suspiciousDonorsCount > 0">
+        <mat-card class="alert-card" [class.has-alerts]="fraudData.suspiciousDonorsCount > 0">
             <div class="alert-header">
                 <mat-icon>warning</mat-icon>
                 <h3>Suspicious Donors</h3>
             </div>
-            <p class="alert-count">{{ fraudData!.suspiciousDonorsCount }}</p>
+            <p class="alert-count">{{ fraudData.suspiciousDonorsCount }}</p>
             <p class="alert-description">Donors with zero pickups despite donations</p>
         </mat-card>
     </div>
 
     <!-- Detailed Reports -->
-    @if (fraudData!.duplicateClaimsCount > 0) {
+    @if (fraudData.duplicateClaimsCount > 0) {
     <mat-card class="detail-card">
         <h2>
             <mat-icon>content_copy</mat-icon>
@@ -56,7 +63,7 @@
             The following users have claimed the same food item multiple times:
         </p>
         <div class="fraud-list">
-            @for (claim of fraudData!.duplicateClaims; track $index) {
+            @for (claim of fraudData.duplicateClaims; track $index) {
             <div class="fraud-item">
                 <mat-icon class="warning-icon">error</mat-icon>
                 <div class="fraud-details">
@@ -69,7 +76,7 @@
     </mat-card>
     }
 
-    @if (fraudData!.rapidClaimUsersCount > 0) {
+    @if (fraudData.rapidClaimUsersCount > 0) {
     <mat-card class="detail-card">
         <h2>
             <mat-icon>speed</mat-icon>
@@ -79,7 +86,7 @@
             The following users have made unusually rapid claims:
         </p>
         <div class="fraud-list">
-            @for (user of fraudData!.rapidClaimUsers; track $index) {
+            @for (user of fraudData.rapidClaimUsers; track $index) {
             <div class="fraud-item">
                 <mat-icon class="warning-icon">warning</mat-icon>
                 <div class="fraud-details">
@@ -92,7 +99,7 @@
     </mat-card>
     }
 
-    @if (fraudData!.suspiciousDonorsCount > 0) {
+    @if (fraudData.suspiciousDonorsCount > 0) {
     <mat-card class="detail-card">
         <h2>
             <mat-icon>warning</mat-icon>
@@ -102,7 +109,7 @@
             The following donors have listings but zero successful pickups:
         </p>
         <div class="fraud-list">
-            @for (donor of fraudData!.suspiciousDonors; track $index) {
+            @for (donor of fraudData.suspiciousDonors; track $index) {
             <div class="fraud-item">
                 <mat-icon class="warning-icon">report_problem</mat-icon>
                 <div class="fraud-details">
@@ -117,8 +124,8 @@
     </mat-card>
     }
 
-    @if (fraudData!.duplicateClaimsCount === 0 && fraudData!.rapidClaimUsersCount === 0 &&
-    fraudData!.suspiciousDonorsCount === 0) {
+    @if (fraudData.duplicateClaimsCount === 0 && fraudData.rapidClaimUsersCount === 0 &&
+    fraudData.suspiciousDonorsCount === 0) {
     <mat-card class="no-fraud-card">
         <mat-icon>verified</mat-icon>
         <h2>All Clear!</h2>

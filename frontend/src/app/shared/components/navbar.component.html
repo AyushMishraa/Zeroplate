@@ -70,7 +70,7 @@
         <mat-icon>person</mat-icon>
         <div>
             <p class="user-name">{{ userName() }}</p>
-            <p class="user-role">{{ userRole() | titlecase }}</p>
+            <p class="user-role">{{ (userRole() || '') | titlecase }}</p>
         </div>
     </div>
     <mat-divider></mat-divider>

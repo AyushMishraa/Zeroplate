@@ -1,26 +1,28 @@
 .fraud-container {
     max-width: 1400px;
     margin: 0 auto;
-    padding: 24px;
+    padding: 28px 24px;
 }
 
 .page-header {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 32px;
+    margin-bottom: 28px;
     flex-wrap: wrap;
     gap: 16px;
 
     h1 {
-        margin: 0 0 8px;
-        font-size: 2rem;
-        color: #333;
+        margin: 0 0 6px;
+        font-size: 1.875rem;
+        font-weight: 700;
+        color: #222;
     }
 
     .subtitle {
         margin: 0;
-        color: #666;
+        color: #777;
+        font-size: 0.95rem;
     }
 }
 
@@ -33,159 +35,190 @@
 
 .alerts-summary {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 24px;
-    margin-bottom: 32px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+    margin-bottom: 28px;
 }
 
 .alert-card {
-    padding: 24px;
+    padding: 24px !important;
+    border-radius: 14px !important;
     text-align: center;
-    transition: all 0.2s;
+    border-left: 4px solid transparent;
+    transition: transform 0.2s, box-shadow 0.2s;
+
+    &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1) !important;
+    }
 
     &.has-alerts {
-        border-left: 4px solid #f44336;
+        border-left-color: #f44336;
+        background: #fff8f8 !important;
+
+        .alert-header mat-icon { color: #f44336; }
+        .alert-count { color: #f44336; }
     }
 
     .alert-header {
         display: flex;
         align-items: center;
         justify-content: center;
-        gap: 12px;
-        margin-bottom: 16px;
+        gap: 10px;
+        margin-bottom: 14px;
 
         mat-icon {
-            font-size: 32px;
-            width: 32px;
-            height: 32px;
-            color: #999;
+            font-size: 28px;
+            width: 28px;
+            height: 28px;
+            color: #bbb;
         }
 
         h3 {
             margin: 0;
-            font-size: 1.125rem;
-            color: #666;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #555;
         }
     }
 
-    &.has-alerts .alert-header mat-icon {
-        color: #f44336;
-    }
-
     .alert-count {
-        margin: 0 0 8px;
-        font-size: 3rem;
-        font-weight: 700;
+        margin: 0 0 6px;
+        font-size: 2.75rem;
+        font-weight: 800;
         color: #333;
-    }
-
-    &.has-alerts .alert-count {
-        color: #f44336;
+        line-height: 1;
     }
 
     .alert-description {
         margin: 0;
-        color: #666;
-        font-size: 0.875rem;
+        color: #888;
+        font-size: 0.82rem;
     }
 }
 
 .detail-card {
-    margin-bottom: 24px;
+    margin-bottom: 20px;
+    border-radius: 12px !important;
 
     h2 {
         display: flex;
         align-items: center;
-        gap: 12px;
-        margin: 0 0 16px;
-        font-size: 1.5rem;
+        gap: 10px;
+        margin: 0 0 14px;
+        font-size: 1.2rem;
+        font-weight: 600;
         color: #333;
 
-        mat-icon {
-            color: #f44336;
-        }
+        mat-icon { color: #f44336; font-size: 22px; width: 22px; height: 22px; }
     }
 
     .warning-text {
-        margin: 0 0 24px;
-        padding: 12px;
-        background: #fff3e0;
-        border-left: 4px solid #ff9800;
-        color: #e65100;
+        margin: 0 0 20px;
+        padding: 12px 14px;
+        background: #fff8e1;
+        border-left: 4px solid #ffc107;
+        color: #7c5e00;
         border-radius: 4px;
+        font-size: 0.875rem;
     }
 }
 
 .fraud-list {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
 }
 
 .fraud-item {
     display: flex;
     align-items: flex-start;
-    gap: 16px;
-    padding: 16px;
+    gap: 14px;
+    padding: 14px 16px;
     background: #fafafa;
-    border-radius: 8px;
+    border-radius: 10px;
     border-left: 3px solid #f44336;
 
     .warning-icon {
-        font-size: 32px;
-        width: 32px;
-        height: 32px;
+        font-size: 28px;
+        width: 28px;
+        height: 28px;
         color: #f44336;
         flex-shrink: 0;
+        margin-top: 2px;
     }
 
     .fraud-details {
         flex: 1;
 
         p {
-            margin: 0 0 8px;
+            margin: 0 0 6px;
             color: #666;
-            font-size: 0.875rem;
+            font-size: 0.85rem;
 
-            &:last-child {
-                margin-bottom: 0;
-            }
+            &:last-child { margin-bottom: 0; }
 
-            strong {
-                color: #333;
-            }
+            strong { color: #333; font-weight: 600; }
         }
     }
 }
 
 .no-fraud-card {
     text-align: center;
-    padding: 80px 24px;
-    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    padding: 72px 24px;
+    background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%) !important;
+    border-radius: 14px !important;
 
     mat-icon {
-        font-size: 96px;
-        width: 96px;
-        height: 96px;
+        display: block;
+        font-size: 80px;
+        width: 80px;
+        height: 80px;
         color: #4caf50;
-        margin-bottom: 24px;
+        margin: 0 auto 20px;
     }
 
     h2 {
-        margin: 0 0 12px;
-        font-size: 2rem;
+        margin: 0 0 10px;
+        font-size: 1.875rem;
+        font-weight: 700;
         color: #2e7d32;
     }
 
     p {
         margin: 0;
         color: #558b2f;
-        font-size: 1.125rem;
+        font-size: 1rem;
+    }
+}
+
+.error-card {
+    text-align: center;
+    padding: 72px 24px;
+    border-radius: 14px !important;
+
+    mat-icon {
+        display: block;
+        font-size: 80px;
+        width: 80px;
+        height: 80px;
+        color: #ef9a9a;
+        margin: 0 auto 20px;
+    }
+
+    h2 {
+        margin: 0 0 10px;
+        color: #c62828;
+        font-weight: 600;
+    }
+
+    p {
+        color: #888;
+        margin: 0 0 24px;
     }
 }
 
 @media (max-width: 768px) {
-    .alerts-summary {
-        grid-template-columns: 1fr;
-    }
+    .fraud-container { padding: 20px 16px; }
+    .alerts-summary { grid-template-columns: 1fr; }
 }

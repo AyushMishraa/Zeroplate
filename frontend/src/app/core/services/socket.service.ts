@@ -60,6 +60,15 @@ export class SocketService {
       });
     });
 
+    this.socket.on('foodClaimed', (data: any) => {
+      this.notificationSubject.next({
+        type: 'foodClaimed',
+        message: `Your food donation "${data.foodTitle}" has been claimed`,
+        data,
+        timestamp: new Date()
+      });
+    });
+
     this.socket.on('disconnect', () => {
       console.log('Socket disconnected');
     });

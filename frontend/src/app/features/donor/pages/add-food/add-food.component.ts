@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -39,11 +39,11 @@ export class AddFoodComponent {
   isLoadingLocation = false;
   minDate = new Date();
   recommendedNGOs: any[] = [];
+  submitted = false;
 
   constructor(
     private fb: FormBuilder,
     private foodService: FoodService,
-    private router: Router,
     private snackBar: MatSnackBar
   ) {
     this.foodForm = this.fb.group({
@@ -99,22 +99,17 @@ export class AddFoodComponent {
       this.foodService.createFood(foodData).subscribe({
         next: (response) => {
           this.isLoading = false;
+          this.submitted = true;
 
-          // Store recommended NGOs if available
           if (response.recommendedNGOs && response.recommendedNGOs.length > 0) {
             this.recommendedNGOs = response.recommendedNGOs.map((ngo: any) => ({
               id: ngo._id,
               name: ngo.name,
-              distance: (ngo.distance / 1000).toFixed(1) // Convert to km
+              distance: (ngo.distance / 1000).toFixed(1)
             }));
           }
 
           this.snackBar.open('Food item added successfully!', 'Close', { duration: 3000 });
-
-          // Navigate to my foods after 1 second
-          setTimeout(() => {
-            this.router.navigate(['/donor/my-foods']);
-          }, 1000);
         },
         error: (error) => {
           this.isLoading = false;

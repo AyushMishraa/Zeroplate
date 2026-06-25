@@ -32,7 +32,9 @@ export class FraudComponent implements OnInit {
     this.loadFraudData();
   }
 
+  // Public so the retry button in the template can call it
   loadFraudData(): void {
+    this.isLoading = true;
     this.analyticsService.getFraudData(60, 5).subscribe({
       next: (response) => {
         this.fraudData = response.data ?? null;

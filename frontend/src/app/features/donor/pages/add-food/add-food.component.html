@@ -1,5 +1,57 @@
 <div class="add-food-container">
     <mat-card class="add-food-card">
+
+        @if (submitted) {
+        <!-- Success / Confirmation view -->
+        <div class="success-view">
+            <div class="success-icon">
+                <mat-icon>check_circle</mat-icon>
+            </div>
+            <h2>Food Item Added!</h2>
+            <p class="success-subtitle">Your donation has been listed successfully.</p>
+
+            @if (recommendedNGOs.length > 0) {
+            <div class="ngo-section">
+                <h3>
+                    <mat-icon>volunteer_activism</mat-icon>
+                    Recommended NGOs Notified
+                </h3>
+                <p class="ngo-info">These nearby NGOs have been notified about your donation:</p>
+                <div class="ngo-list">
+                    @for (ngo of recommendedNGOs; track ngo.id) {
+                    <div class="ngo-item">
+                        <div class="ngo-avatar">
+                            <mat-icon>volunteer_activism</mat-icon>
+                        </div>
+                        <div class="ngo-details">
+                            <strong>{{ ngo.name }}</strong>
+                            <p>{{ ngo.distance }} km away</p>
+                        </div>
+                    </div>
+                    }
+                </div>
+            </div>
+            } @else {
+            <div class="ngo-section no-ngos">
+                <mat-icon>info_outline</mat-icon>
+                <p>No nearby NGOs found at this time. Your listing is still live!</p>
+            </div>
+            }
+
+            <div class="success-actions">
+                <button mat-raised-button color="primary" routerLink="/donor/my-foods">
+                    <mat-icon>list</mat-icon>
+                    View My Listings
+                </button>
+                <button mat-stroked-button (click)="submitted = false; foodForm.reset(); recommendedNGOs = []">
+                    <mat-icon>add</mat-icon>
+                    Add Another Item
+                </button>
+            </div>
+        </div>
+
+        } @else {
+        <!-- Form view -->
         <div class="card-header">
             <div>
                 <h1>Add Food Donation</h1>
@@ -93,28 +145,6 @@
                 </button>
             </div>
 
-            <!-- Recommended NGOs Info -->
-            @if (recommendedNGOs.length > 0) {
-            <div class="form-section recommended-section">
-                <h3>Recommended NGOs</h3>
-                <p class="info-text">
-                    <mat-icon>info</mat-icon>
-                    These NGOs will be notified about your food donation
-                </p>
-                <div class="ngo-list">
-                    @for (ngo of recommendedNGOs; track ngo.id) {
-                    <div class="ngo-item">
-                        <mat-icon>volunteer_activism</mat-icon>
-                        <div>
-                            <strong>{{ ngo.name }}</strong>
-                            <p>{{ ngo.distance }} km away</p>
-                        </div>
-                    </div>
-                    }
-                </div>
-            </div>
-            }
-
             <!-- Form Actions -->
             <div class="form-actions">
                 <button mat-button type="button" routerLink="/donor/dashboard" [disabled]="isLoading">
@@ -130,5 +160,7 @@
                 </button>
             </div>
         </form>
+        }
+
     </mat-card>
 </div>

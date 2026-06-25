@@ -57,6 +57,9 @@ export class ReceiverDashboardComponent implements OnInit {
       next: (response) => {
         this.nearbyFoods = Array.isArray(response.food) ? response.food : [];
         this.stats.availableFood = this.nearbyFoods.length;
+      },
+      error: () => {
+        this.nearbyFoods = [];
       }
     });
 
