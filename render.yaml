@@ -46,7 +46,6 @@ services:
     name: zeroplate-frontend
     runtime: static
     plan: free
-    region: oregon
     rootDir: frontend
     buildCommand: npm install && npm run build:prod
     staticPublishPath: dist/zeroplate-app/browser
