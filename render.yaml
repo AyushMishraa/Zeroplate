@@ -5,7 +5,7 @@ services:
   - type: web
     name: zeroplate-backend
     runtime: node
-    plan: hobby
+    plan: free
     region: oregon
     rootDir: backend
     buildCommand: npm install && npm run build
@@ -45,7 +45,7 @@ services:
   - type: web
     name: zeroplate-frontend
     runtime: static
-    plan: hobby
+    plan: free
     rootDir: frontend
     buildCommand: npm install && npm run build:prod
     staticPublishPath: dist/zeroplate-app/browser
@@ -65,7 +65,7 @@ services:
   # -------------------------------------------------------------
   - type: redis
     name: zeroplate-redis
-    plan: hobby
+    plan: free
     region: oregon
     maxmemoryPolicy: noeviction
     ipAllowList: []
