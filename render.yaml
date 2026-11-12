@@ -8,7 +8,7 @@ services:
     plan: free
     region: oregon
     rootDir: backend
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build
     startCommand: npm start
     envVars:
       - key: NODE_ENV
@@ -46,7 +46,7 @@ services:
     name: zeroplate-frontend
     runtime: static
     rootDir: frontend
-    buildCommand: npm install && npm run build:prod
+    buildCommand: npm install --include=dev && npm run build:prod
     staticPublishPath: dist/zeroplate-app/browser
     envVars:
       - key: BACKEND_URL
