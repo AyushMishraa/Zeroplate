@@ -61,11 +61,12 @@ services:
         source: /*
         destination: /index.html
 
-# ---------------------------------------------------------------
-# Redis Service (for BullMQ queues & workers)
-# ---------------------------------------------------------------
-redis:
-  - name: zeroplate-redis
+  # -------------------------------------------------------------
+  # Redis / Key Value Service (for BullMQ queues & workers)
+  # -------------------------------------------------------------
+  - type: redis
+    name: zeroplate-redis
     plan: free
     region: oregon
     maxmemoryPolicy: noeviction
+    ipAllowList: []

@@ -1,19 +1,23 @@
 const fs = require('fs');
 const path = require('path');
 
-const backendUrl = process.env.BACKEND_URL || process.env.API_URL;
+let backendUrl = process.env.BACKEND_URL || process.env.API_URL;
 
 if (backendUrl) {
-  const cleanUrl = backendUrl.replace(/\/+$/, '');
+  backendUrl = backendUrl.trim().replace(/\/+$/, '');
+  // Ensure protocol is present (Render's 'host' property provides the domain without https://)
+  if (!backendUrl.startsWith('http://') && !backendUrl.startsWith('https://')) {
+    backendUrl = `https://${backendUrl}`;
+  }
   const envContent = `export const environment = {
   production: true,
-  apiUrl: '${cleanUrl}/api',
-  socketUrl: '${cleanUrl}'
+  apiUrl: '${backendUrl}/api',
+  socketUrl: '${backendUrl}'
 };
 `;
   const envPath = path.join(__dirname, 'src', 'environments', 'environment.prod.ts');
   fs.writeFileSync(envPath, envContent, 'utf8');
-  console.log(`[set-env] Successfully injected BACKEND_URL=${cleanUrl} into environment.prod.ts`);
+  console.log(`[set-env] Successfully injected BACKEND_URL=${backendUrl} into environment.prod.ts`);
 } else {
   console.log('[set-env] No BACKEND_URL provided, keeping existing environment.prod.ts');
 }
