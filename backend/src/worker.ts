@@ -4,6 +4,10 @@ import { FoodModel } from '../src/models/foodModel';
 import { sendNotificationMail } from '../src/services/emailServices';
 import { findBestNGOsForFood } from '../src/services/matchingService';
 
+const connection = {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10)
+};
 
 // Worker to handle food pickup notifications
 export const pickupWorker = new Worker('pickupQueue', async(job) => {
@@ -12,11 +16,7 @@ export const pickupWorker = new Worker('pickupQueue', async(job) => {
     await sendNotificationMail(email, `Reminder: Pickup for ${foodTitle} pending...`);
 },
 {
-    // optional: connection settings for Redis
-    connection: {
-      host: "localhost",
-      port: 6379,
-    }
+    connection
 }
 );
 
@@ -32,11 +32,7 @@ export const expiryWorker = new Worker('expiryQueue', async(job) => {
     }
 },
 {
-    // optional: connection settings for Redis
-    connection: {
-      host: "localhost",
-      port: 6379,
-    }
+    connection
 }
 );
 
@@ -47,11 +43,7 @@ export const matchingEngineWorker = new Worker('matchingEngineQueue', async(job)
     console.log("Top matched NGOs:", rankedNGOs.slice(0, 3));
 },
 {
-    // optional: connection settings for Redis
-    connection: {
-      host: "localhost",
-      port: 6379,
-    }
+    connection
 }
 );
 

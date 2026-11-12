@@ -1,0 +1,71 @@
+services:
+  # -------------------------------------------------------------
+  # ZeroPlate Backend Web Service
+  # -------------------------------------------------------------
+  - type: web
+    name: zeroplate-backend
+    runtime: node
+    plan: free
+    region: oregon
+    rootDir: backend
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DB_HOST
+        sync: false # Set in Render dashboard (e.g., your MongoDB Atlas connection string)
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: zeroplate-redis
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: FRONTEND_URL
+        sync: false # Set to your frontend static site URL once created (e.g. https://zeroplate-frontend.onrender.com)
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: GOOGLE_CLIENT_SECRET
+        sync: false
+      - key: OAUTH_CALLBACK_URL
+        sync: false # e.g. https://zeroplate-backend.onrender.com/api/auth/google/callback
+      - key: GOOGLE_MAPS_API_KEY
+        sync: false
+      - key: EMAIL_USER
+        sync: false
+      - key: EMAIL_PASS
+        sync: false
+
+  # -------------------------------------------------------------
+  # ZeroPlate Frontend Static Site (Free, CDN, Always On)
+  # -------------------------------------------------------------
+  - type: web
+    name: zeroplate-frontend
+    runtime: static
+    plan: free
+    region: oregon
+    rootDir: frontend
+    buildCommand: npm install && npm run build:prod
+    staticPublishPath: dist/zeroplate-app/browser
+    envVars:
+      - key: BACKEND_URL
+        fromService:
+          type: web
+          name: zeroplate-backend
+          property: host
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html
+
+# ---------------------------------------------------------------
+# Redis Service (for BullMQ queues & workers)
+# ---------------------------------------------------------------
+redis:
+  - name: zeroplate-redis
+    plan: free
+    region: oregon
+    maxmemoryPolicy: noeviction

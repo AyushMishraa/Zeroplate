@@ -1,23 +1,13 @@
 import { Queue } from 'bullmq';
-import  redisConfig from '../config/redis';
+import redisConfig from '../config/redis';
 
-export const pickupQueue = new Queue('pickupQueue', {
-    connection: {
-        host: 'localhost',
-        port: 6379
-    }
-});
+const connection = {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379', 10)
+};
 
-export const expiryQueue = new Queue('expiryQueue', {
-    connection: {
-        host: 'localhost',
-        port: 6379
-    }
-});
+export const pickupQueue = new Queue('pickupQueue', { connection });
 
-export const matchingEngineQueue = new Queue('matchingEngineQueue', {
-    connection: {
-        host: 'localhost',
-        port: 6379
-    }
-});
+export const expiryQueue = new Queue('expiryQueue', { connection });
+
+export const matchingEngineQueue = new Queue('matchingEngineQueue', { connection });

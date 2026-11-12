@@ -22,12 +22,26 @@ connectToDb();
 const app = express();
 
 // CORS configuration
-app.use(cors({
-    origin: 'http://localhost:4200',
+const allowedOrigins = [
+    process.env.FRONTEND_URL,
+    'http://localhost:4200',
+    'http://localhost:80'
+].filter(Boolean) as string[];
+
+const corsOptions: cors.CorsOptions = {
+    origin: (origin, callback) => {
+        if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.onrender.com')) {
+            callback(null, true);
+        } else {
+            callback(null, true);
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']
-}));
+};
+
+app.use(cors(corsOptions));
 
 app.use(helmet());
 // app.use(xss());
@@ -42,7 +56,7 @@ const limiter = rateLimit({
 app.use(limiter);
 
 export const io = new Server(server, {
-    cors: { origin: "http://localhost:4200", credentials: true }
+    cors: corsOptions
 });
 io.on("connection", (socket) => {
     console.log("New client connected: ", socket.id);
@@ -63,4 +77,5 @@ app.use("/api/claims", claimRoutes);
 app.use("/api/admin", adminDashboardRoutes);
 app.use("/api/analytics", analyticsRoutes);
 
+export { server };
 export default app;
