@@ -69,7 +69,6 @@ io.on("connection", (socket) => {
 app.use(cookieParser());
 app.use(passport.initialize());
 app.use(errorHandler);
-
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/foods", foodRoutes);
