@@ -3,7 +3,12 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { AuthService } from '../../../../core/services/auth.service';
+import { User } from '../../../../core/models';
 
+/**
+ * The backend's /auth/google/callback sets an httpOnly cookie and redirects here
+ * with `?user=<json>` (and optionally `&token=`). New Google users pick a role next.
+ */
 @Component({
   selector: 'app-google-callback',
   standalone: true,
@@ -19,23 +24,31 @@ export class GoogleCallbackComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    // Extract user and token from query parameters
-    this.route.queryParams.subscribe(params => {
-      const user = params['user'];
-      const token = params['token'];
+    const params = this.route.snapshot.queryParamMap;
+    const rawUser = params.get('user');
+    const token = params.get('token');
 
-      if (user && token) {
-        try {
-          const userData = JSON.parse(decodeURIComponent(user));
-          this.authService.handleGoogleCallback(userData, token);
-        } catch (error) {
-          console.error('Failed to parse user data:', error);
-          this.router.navigate(['/auth/login']);
-        }
-      } else {
-        // No user/token, redirect to login
-        this.router.navigate(['/auth/login']);
+    if (!rawUser) {
+      this.fail();
+      return;
+    }
+
+    try {
+      // Angular already decodes query params; decode again only if still encoded.
+      const json = rawUser.trim().startsWith('{') ? rawUser : decodeURIComponent(rawUser);
+      const user = JSON.parse(json) as User;
+      if (!user?._id || !user.email) {
+        this.fail();
+        return;
       }
-    });
+      this.authService.handleGoogleCallback(user, token);
+    } catch (error) {
+      console.error('Failed to parse Google sign-in response:', error);
+      this.fail();
+    }
+  }
+
+  private fail(): void {
+    this.router.navigate(['/auth/login'], { queryParams: { error: 'google' }, replaceUrl: true });
   }
 }

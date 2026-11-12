@@ -14,9 +14,8 @@
 
     h1 {
         margin: 0;
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: #222;
+        font-size: 2rem;
+        color: var(--zp-text);
     }
 
     .header-actions {
@@ -69,12 +68,29 @@
             color: white;
         }
 
-        &.users    { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-        &.food     { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-        &.claims   { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
-        &.pending  { background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%); }
-        &.success  { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
-        &.expired  { background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); }
+        &.users {
+            background: var(--zp-brand-gradient);
+        }
+
+        &.food {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        &.claims {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        &.pending {
+            background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+        }
+
+        &.success {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        &.expired {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
     }
 
     .stat-content {
@@ -83,18 +99,14 @@
         h3 {
             margin: 0 0 3px;
             font-size: 1.75rem;
-            font-weight: 700;
-            color: #222;
-            line-height: 1;
+            font-weight: 600;
+            color: var(--zp-text);
         }
 
         p {
             margin: 0;
-            color: #777;
-            font-size: 0.8rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.03em;
+            color: var(--zp-text-secondary);
+            font-size: 0.875rem;
         }
     }
 }
@@ -105,10 +117,9 @@
     border-radius: 12px !important;
 
     h2 {
-        margin: 0 0 20px;
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #222;
+        margin: 0 0 24px;
+        font-size: 1.5rem;
+        color: var(--zp-text);
     }
 }
 
@@ -142,9 +153,10 @@
     }
 
     .type-bar {
-        height: 28px;
-        background: #f0f0f0;
-        border-radius: 6px;
+        flex: 1;
+        height: 32px;
+        background: var(--zp-surface-2);
+        border-radius: 4px;
         overflow: hidden;
 
         .type-fill {
@@ -158,9 +170,8 @@
 
     .type-count {
         text-align: right;
-        font-weight: 700;
-        color: #667eea;
-        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--zp-brand);
     }
 }
 
@@ -171,12 +182,9 @@
     width: 100%;
 
     th {
-        background: #f8f8f8;
+        background: var(--zp-surface-2);
         font-weight: 600;
-        color: #555;
-        font-size: 0.85rem;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
+        color: var(--zp-text);
     }
 
     td { font-size: 0.875rem; color: #444; }
@@ -206,7 +214,10 @@
         margin: 0 auto 14px;
     }
 
-    p { color: #777; margin: 0; }
+    p {
+        color: var(--zp-text-secondary);
+        margin: 0;
+    }
 }
 
 @media (max-width: 768px) {
@@ -216,13 +227,38 @@
         grid-template-columns: repeat(2, 1fr);
         gap: 14px;
     }
+}
+.charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    gap: 24px;
+    margin-bottom: 24px;
 
-    .type-item {
-        grid-template-columns: 90px 1fr 36px;
-        gap: 10px;
+    @media (max-width: 420px) {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-card {
+        margin-bottom: 0;
+    }
+
+    h2 {
+        margin-bottom: 16px;
     }
 }
 
-@media (max-width: 400px) {
-    .stats-grid { grid-template-columns: 1fr; }
+.food-type-list {
+    margin-top: 16px;
+}
+
+.empty-state.small {
+    padding: 32px 16px;
+}
+
+.loading-container.small {
+    padding: 32px;
+}
+
+.header-actions {
+    flex-wrap: wrap;
 }

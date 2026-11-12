@@ -4,7 +4,7 @@
     align-items: center;
     justify-content: center;
     padding: 24px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: var(--zp-brand-gradient);
 }
 
 .login-card {
@@ -18,9 +18,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    color: #667eea;
+    gap: 12px;
+    margin-bottom: 24px;
+    color: var(--zp-brand);
 
     mat-icon {
         font-size: 2.25rem;
@@ -45,9 +45,12 @@ h2 {
 
 .subtitle {
     text-align: center;
-    color: #777;
-    margin: 0 0 28px;
-    font-size: 0.9rem;
+    color: var(--zp-text-secondary);
+    margin: 0 0 32px;
+}
+
+.full-width {
+    width: 100%;
 }
 
 mat-form-field {
@@ -79,15 +82,19 @@ mat-form-field {
         content: '';
         flex: 1;
         height: 1px;
-        background: #e0e0e0;
+        background: var(--zp-surface-3);
     }
 }
 
 .divider-text {
-    font-size: 0.8rem;
-    color: #999;
-    font-weight: 500;
-    white-space: nowrap;
+    background: var(--zp-surface);
+    padding: 0 16px;
+    position: relative;
+    color: var(--zp-text-muted);
+    font-size: 0.875rem;
+    display: inline-block;
+    left: 50%;
+    transform: translateX(-50%);
 }
 
 .google-button {
@@ -109,12 +116,11 @@ mat-form-field {
 
 .signup-link {
     text-align: center;
-    margin-top: 20px;
-    color: #777;
-    font-size: 0.9rem;
+    margin-top: 24px;
+    color: var(--zp-text-secondary);
 
     a {
-        color: #667eea;
+        color: var(--zp-brand);
         text-decoration: none;
         font-weight: 600;
         margin-left: 4px;
@@ -124,15 +130,26 @@ mat-form-field {
         }
     }
 }
+.notice {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-bottom: 16px;
+    border-radius: 8px;
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--zp-text);
+    font-size: 0.9rem;
 
-@media (max-width: 480px) {
-    .login-container {
-        padding: 16px;
-        align-items: flex-start;
-        padding-top: 40px;
+    mat-icon {
+        color: var(--zp-brand);
+        flex-shrink: 0;
     }
+}
 
-    .login-card {
-        padding: 28px 20px !important;
-    }
+svg.google-icon {
+    width: 18px;
+    height: 18px;
+    margin-right: 8px;
+    vertical-align: middle;
 }

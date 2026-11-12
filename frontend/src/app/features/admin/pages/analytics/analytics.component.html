@@ -1,53 +1,99 @@
 <div class="analytics-container">
     <div class="page-header">
         <h1>Platform Analytics</h1>
-        <a mat-button routerLink="/admin/dashboard">
-            <mat-icon>arrow_back</mat-icon>
-            Back to Dashboard
-        </a>
+        <div class="header-actions">
+            <button mat-stroked-button (click)="load()" [disabled]="isLoading">
+                <mat-icon>refresh</mat-icon>
+                Refresh
+            </button>
+            <a mat-button routerLink="/admin/dashboard">
+                <mat-icon>arrow_back</mat-icon>
+                Back to Dashboard
+            </a>
+        </div>
     </div>
 
     @if (isLoading) {
-    <div class="loading-container">
-        <mat-spinner diameter="60"></mat-spinner>
+    <app-skeleton variant="stats" [count]="4"></app-skeleton>
+    <app-skeleton variant="table" [count]="3"></app-skeleton>
+    } @else if (loadError) {
+    <div class="empty-state">
+        <mat-icon>cloud_off</mat-icon>
+        <p>Couldn't load analytics.</p>
+        <button mat-raised-button color="primary" (click)="load()">Try again</button>
     </div>
     } @else {
     <!-- Summary Cards -->
     <div class="summary-grid">
-        <mat-card class="summary-card">
+        <mat-card class="summary-card" appReveal>
             <mat-icon>restaurant</mat-icon>
-            <h3>{{ summary?.totalDonations || 0 }}</h3>
+            <h3 [appCountUp]="summary?.totalDonations || 0"></h3>
             <p>Total Donations</p>
         </mat-card>
 
-        <mat-card class="summary-card">
+        <mat-card class="summary-card" appReveal>
             <mat-icon>shopping_basket</mat-icon>
-            <h3>{{ summary?.totalClaims || 0 }}</h3>
+            <h3 [appCountUp]="summary?.totalClaims || 0"></h3>
             <p>Total Claims</p>
         </mat-card>
 
-        <mat-card class="summary-card">
+        <mat-card class="summary-card" appReveal>
             <mat-icon>set_meal</mat-icon>
-            <h3>{{ summary?.totalMealsSaved || 0 }}</h3>
+            <h3 [appCountUp]="summary?.totalMealsSaved || 0"></h3>
             <p>Meals Saved</p>
         </mat-card>
 
-        <mat-card class="summary-card">
+        <mat-card class="summary-card" appReveal>
             <mat-icon>person</mat-icon>
-            <h3>{{ summary?.activeDonors || 0 }}</h3>
+            <h3 [appCountUp]="summary?.activeDonors || 0"></h3>
             <p>Active Donors</p>
         </mat-card>
 
-        <mat-card class="summary-card">
+        <mat-card class="summary-card" appReveal>
             <mat-icon>volunteer_activism</mat-icon>
-            <h3>{{ summary?.activeReceivers || 0 }}</h3>
+            <h3 [appCountUp]="summary?.activeReceivers || 0"></h3>
             <p>Active Receivers</p>
         </mat-card>
 
-        <mat-card class="summary-card impact">
+        <mat-card class="summary-card" appReveal>
+            <mat-icon>percent</mat-icon>
+            <h3 [appCountUp]="claimRate()" countSuffix="%"></h3>
+            <p>Claim Rate</p>
+        </mat-card>
+
+        <mat-card class="summary-card impact" appReveal>
             <mat-icon>eco</mat-icon>
-            <h3>{{ calculateCO2() }} kg</h3>
-            <p>CO₂ Saved</p>
+            <h3 [appCountUp]="calculateCO2()" countSuffix=" kg"></h3>
+            <p>CO₂ Saved (est.)</p>
+        </mat-card>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+        <mat-card class="chart-card" appReveal>
+            <h2>Listings by Status</h2>
+            @if (hasStatusData) {
+            <app-chart type="doughnut" [labels]="statusLabels" [datasets]="statusDatasets"
+                ariaLabel="Listings by status"></app-chart>
+            } @else {
+            <div class="empty-state">
+                <mat-icon>pie_chart</mat-icon>
+                <p>No listings yet</p>
+            </div>
+            }
+        </mat-card>
+
+        <mat-card class="chart-card" appReveal>
+            <h2>Top 5 Donors by Servings</h2>
+            @if (donorLabels.length) {
+            <app-chart type="bar" [labels]="donorLabels" [datasets]="donorDatasets"
+                ariaLabel="Servings donated by the top five donors"></app-chart>
+            } @else {
+            <div class="empty-state">
+                <mat-icon>bar_chart</mat-icon>
+                <p>No donor data yet</p>
+            </div>
+            }
         </mat-card>
     </div>
 
@@ -66,12 +112,12 @@
 
                 <ng-container matColumnDef="name">
                     <th mat-header-cell *matHeaderCellDef>Donor Name</th>
-                    <td mat-cell *matCellDef="let donor">{{ donor.donor.name }}</td>
+                    <td mat-cell *matCellDef="let donor">{{ donor.donor?.name || 'Unknown' }}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="email">
                     <th mat-header-cell *matHeaderCellDef>Email</th>
-                    <td mat-cell *matCellDef="let donor">{{ donor.donor.email }}</td>
+                    <td mat-cell *matCellDef="let donor">{{ donor.donor?.email || '—' }}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="donations">

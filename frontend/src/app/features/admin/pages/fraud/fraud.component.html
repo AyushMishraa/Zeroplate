@@ -10,9 +10,34 @@
         </a>
     </div>
 
+    <mat-card class="settings-card">
+        <form class="settings" (ngSubmit)="loadFraudData()">
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Rapid-claim window (minutes)</mat-label>
+                <input matInput type="number" min="1" name="recentMinutes" [(ngModel)]="recentMinutes">
+            </mat-form-field>
+            <mat-form-field appearance="outline" subscriptSizing="dynamic">
+                <mat-label>Claims to flag a user</mat-label>
+                <input matInput type="number" min="2" name="rapidThreshold" [(ngModel)]="rapidThreshold">
+            </mat-form-field>
+            <button mat-raised-button color="primary" type="submit" [disabled]="isLoading">
+                <mat-icon>policy</mat-icon>
+                Run checks
+            </button>
+            @if (lastChecked) {
+            <span class="last-checked">Last checked {{ lastChecked | date: 'shortTime' }}</span>
+            }
+        </form>
+    </mat-card>
+
     @if (isLoading) {
-    <div class="loading-container">
-        <mat-spinner diameter="60"></mat-spinner>
+    <app-skeleton variant="stats" [count]="4"></app-skeleton>
+    <app-skeleton variant="table" [count]="3"></app-skeleton>
+    } @else if (loadError || !fraudData) {
+    <div class="empty-state">
+        <mat-icon>cloud_off</mat-icon>
+        <p>Couldn't run fraud checks.</p>
+        <button mat-raised-button color="primary" (click)="loadFraudData()">Try again</button>
     </div>
     } @else if (!fraudData) {
     <mat-card class="error-card">
@@ -24,31 +49,33 @@
     } @else {
     <!-- Alert Summary -->
     <div class="alerts-summary">
-        <mat-card class="alert-card" [class.has-alerts]="fraudData.duplicateClaimsCount > 0">
+        <mat-card appReveal class="alert-card" [class.has-alerts]="fraudData.duplicateClaimsCount > 0">
             <div class="alert-header">
                 <mat-icon>content_copy</mat-icon>
                 <h3>Duplicate Claims</h3>
             </div>
-            <p class="alert-count">{{ fraudData.duplicateClaimsCount }}</p>
-            <p class="alert-description">Users with duplicate claims detected</p>
+            <p class="alert-count" [appCountUp]="fraudData.duplicateClaimsCount"></p>
+            <p class="alert-description">Same receiver claiming the same food more than once</p>
         </mat-card>
 
-        <mat-card class="alert-card" [class.has-alerts]="fraudData.rapidClaimUsersCount > 0">
+        <mat-card appReveal class="alert-card" [class.has-alerts]="fraudData.rapidClaimUsersCount > 0">
             <div class="alert-header">
                 <mat-icon>speed</mat-icon>
                 <h3>Rapid Claims</h3>
             </div>
-            <p class="alert-count">{{ fraudData.rapidClaimUsersCount }}</p>
-            <p class="alert-description">Users making rapid multiple claims</p>
+            <p class="alert-count" [appCountUp]="fraudData.rapidClaimUsersCount"></p>
+            <p class="alert-description">
+                Receivers with {{ rapidThreshold }}+ claims in {{ recentMinutes }} minutes
+            </p>
         </mat-card>
 
-        <mat-card class="alert-card" [class.has-alerts]="fraudData.suspiciousDonorsCount > 0">
+        <mat-card appReveal class="alert-card" [class.has-alerts]="fraudData.suspiciousDonorsCount > 0">
             <div class="alert-header">
                 <mat-icon>warning</mat-icon>
                 <h3>Suspicious Donors</h3>
             </div>
-            <p class="alert-count">{{ fraudData.suspiciousDonorsCount }}</p>
-            <p class="alert-description">Donors with zero pickups despite donations</p>
+            <p class="alert-count" [appCountUp]="fraudData.suspiciousDonorsCount"></p>
+            <p class="alert-description">Donors with 10+ listings and zero pickups</p>
         </mat-card>
     </div>
 
@@ -59,16 +86,19 @@
             <mat-icon>content_copy</mat-icon>
             Duplicate Claims Details
         </h2>
-        <p class="warning-text">
-            The following users have claimed the same food item multiple times:
-        </p>
+        <p class="warning-text">These receivers have claimed the same food item multiple times:</p>
         <div class="fraud-list">
-            @for (claim of fraudData.duplicateClaims; track $index) {
+            @for (group of fraudData.duplicateClaims; track $index) {
             <div class="fraud-item">
                 <mat-icon class="warning-icon">error</mat-icon>
                 <div class="fraud-details">
-                    <p><strong>User ID:</strong> {{ claim._id }}</p>
-                    <p><strong>Claims Count:</strong> {{ claim.count }}</p>
+                    <p><strong>Receiver:</strong>
+                        <button class="id-chip" type="button" (click)="copy(group._id.receiver)" matTooltip="Copy full ID">
+                            {{ shortId(group._id.receiver) }}
+                        </button>
+                    </p>
+                    <p><strong>Food:</strong> {{ foodLabel(group._id.food) }}</p>
+                    <p><strong>Claims:</strong> {{ group.count }}</p>
                 </div>
             </div>
             }
@@ -82,16 +112,18 @@
             <mat-icon>speed</mat-icon>
             Rapid Claim Activity
         </h2>
-        <p class="warning-text">
-            The following users have made unusually rapid claims:
-        </p>
+        <p class="warning-text">These receivers have made unusually rapid claims:</p>
         <div class="fraud-list">
             @for (user of fraudData.rapidClaimUsers; track $index) {
             <div class="fraud-item">
                 <mat-icon class="warning-icon">warning</mat-icon>
                 <div class="fraud-details">
-                    <p><strong>User ID:</strong> {{ user._id }}</p>
-                    <p><strong>Recent Claims:</strong> {{ user.recentClaims }}</p>
+                    <p><strong>Receiver:</strong>
+                        <button class="id-chip" type="button" (click)="copy(user._id)" matTooltip="Copy full ID">
+                            {{ shortId(user._id) }}
+                        </button>
+                    </p>
+                    <p><strong>Claims in window:</strong> {{ user.recentClaims }}</p>
                 </div>
             </div>
             }
@@ -105,18 +137,16 @@
             <mat-icon>warning</mat-icon>
             Suspicious Donor Activity
         </h2>
-        <p class="warning-text">
-            The following donors have listings but zero successful pickups:
-        </p>
+        <p class="warning-text">These donors have many listings but no successful pickups:</p>
         <div class="fraud-list">
             @for (donor of fraudData.suspiciousDonors; track $index) {
             <div class="fraud-item">
                 <mat-icon class="warning-icon">report_problem</mat-icon>
                 <div class="fraud-details">
-                    <p><strong>Donor ID:</strong> {{ donor._id }}</p>
-                    <p><strong>Total Donations:</strong> {{ donor.totalDonations }}</p>
-                    <p><strong>Total Quantity:</strong> {{ donor.totalQuantity }}</p>
-                    <p><strong>Picked Up:</strong> {{ donor.pickedUpCount }}</p>
+                    <p><strong>Donor:</strong> {{ donorLabel(donor._id) }}</p>
+                    <p><strong>Listings:</strong> {{ donor.totalDonations }}</p>
+                    <p><strong>Servings listed:</strong> {{ donor.totalQuantity }}</p>
+                    <p><strong>Picked up:</strong> {{ donor.pickedUpCount }}</p>
                 </div>
             </div>
             }
@@ -124,12 +154,11 @@
     </mat-card>
     }
 
-    @if (fraudData.duplicateClaimsCount === 0 && fraudData.rapidClaimUsersCount === 0 &&
-    fraudData.suspiciousDonorsCount === 0) {
+    @if (totalAlerts === 0) {
     <mat-card class="no-fraud-card">
         <mat-icon>verified</mat-icon>
         <h2>All Clear!</h2>
-        <p>No suspicious activity detected at this time.</p>
+        <p>No suspicious activity detected with the current rules.</p>
     </mat-card>
     }
     }

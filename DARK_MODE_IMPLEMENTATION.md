@@ -30,8 +30,8 @@ A complete dark mode toggle feature has been implemented for the ZeroPlate appli
   - Smooth transitions for all theme changes
   - Custom scrollbar styling for dark mode
 
-- **Home Component Styles**: `src/app/features/home/home.component.scss`
-  - Dark mode styles for all home page elements
+- **Component Styles**: every component SCSS uses the `--zp-*` colour tokens from `src/styles.scss`
+  - Tokens switch automatically under `body.dark-theme`
   - Feature cards, stat cards, testimonials
   - Hero section and CTA sections
   - Footer styling

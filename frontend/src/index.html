@@ -2,12 +2,32 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>ZeroplateApp</title>
+  <title>ZeroPlate | Food Waste Redistribution</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="ZeroPlate connects food donors with NGOs to redistribute surplus food and reduce waste.">
+  <meta name="theme-color" content="#667eea">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <script>
+    // Apply the saved theme before Angular boots to avoid a light flash.
+    (function () {
+      try {
+        var saved = localStorage.getItem('zp_theme');
+        var dark = saved ? saved === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (dark) document.documentElement.classList.add('dark-theme-preload');
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    html.dark-theme-preload, html.dark-theme-preload body { background: #121212; }
+  </style>
 </head>
-<body>
+<body class="mat-typography">
   <app-root></app-root>
+  <noscript>ZeroPlate needs JavaScript enabled to run.</noscript>
 </body>
 </html>

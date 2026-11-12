@@ -1,202 +1,96 @@
-.browse-container {
-    max-width: 1400px;
-    margin: 0 auto;
-    padding: 28px 24px;
-}
+.browse-container { max-width: 1400px; margin: 0 auto; padding: 24px; }
 
 .page-header {
-    margin-bottom: 24px;
-
-    h1 {
-        margin: 0 0 6px;
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: #222;
-    }
-
-    .subtitle {
-        margin: 0;
-        color: #777;
-        font-size: 0.95rem;
-    }
+  margin-bottom: 24px;
+  h1 { margin: 0 0 8px; font-size: 2rem; color: var(--zp-text); }
+  .subtitle { margin: 0; color: var(--zp-text-secondary); }
 }
 
-.filter-card {
-    margin-bottom: 28px;
-    padding: 20px !important;
-    border-radius: 12px !important;
+.filter-card { margin-bottom: 32px; padding: 24px; }
 
-    .search-field {
-        width: 100%;
-        margin-bottom: 12px;
-    }
-
-    .filter-chips {
-        mat-chip-set {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        mat-chip { cursor: pointer; }
-    }
+.filter-row {
+  display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 12px;
+  .search-field { flex: 1 1 280px; min-width: 0; }
+  .sort-field { flex: 0 0 200px; }
+  &.secondary { align-items: center; justify-content: space-between; margin: 12px 0 0; }
 }
+.filter-chips { display: flex; flex-wrap: wrap; gap: 8px; justify-content: space-between; }
 
-.loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 400px;
+.servings-filter { display: flex; align-items: center; gap: 12px; flex: 1 1 320px; flex-wrap: wrap; }
+.servings-label {
+  display: inline-flex; align-items: center; gap: 6px; color: var(--zp-text-secondary); white-space: nowrap;
+  mat-icon { font-size: 20px; width: 20px; height: 20px; }
+  strong { color: var(--zp-text); min-width: 2ch; display: inline-block; text-align: center; }
 }
+.servings-slider { flex: 1; min-width: 160px; max-width: 360px; }
+.view-toggle { flex-shrink: 0; }
 
+.result-count { color: var(--zp-text-secondary); margin: 0 0 12px; font-size: 0.9rem; }
+
+/* ---------- Cards ---------- */
 .foods-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 24px;
 }
 
 .food-card {
-    border-radius: 14px !important;
-    padding: 20px !important;
-    transition: transform 0.2s, box-shadow 0.2s;
-    display: flex;
-    flex-direction: column;
+  display: flex; flex-direction: column; border-radius: 14px !important; overflow: hidden;
+  transition: transform 0.25s ease, box-shadow 0.25s ease, opacity 0.35s ease;
+  &:hover { transform: translateY(-6px); box-shadow: 0 14px 28px rgba(0, 0, 0, 0.14); }
+  &.leaving { opacity: 0 !important; transform: scale(0.85) !important; }
 
-    &:hover {
-        transform: translateY(-4px);
-        box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12) !important;
-    }
-
-    .card-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 14px;
-
-        .food-icon {
-            width: 52px;
-            height: 52px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-
-            mat-icon {
-                font-size: 26px;
-                width: 26px;
-                height: 26px;
-                color: white;
-            }
-        }
-
-        .urgency-badge {
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-size: 0.72rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            background: #e8f5e9;
-            color: #2e7d32;
-
-            &.urgent {
-                background: #ffebee;
-                color: #c62828;
-                animation: pulse 2s infinite;
-            }
-        }
-    }
-
-    h3 {
-        margin: 0 0 6px;
-        font-size: 1.1rem;
-        font-weight: 600;
-        color: #222;
-    }
-
-    .food-type {
-        margin: 0 0 14px;
-        color: #888;
-        font-size: 0.82rem;
-        text-transform: capitalize;
-        font-weight: 500;
-    }
-
-    .food-details {
-        display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-bottom: 18px;
-        padding-bottom: 16px;
-        border-bottom: 1px solid #f0f0f0;
-        flex: 1;
-
-        .detail-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: #666;
-            font-size: 0.85rem;
-
-            mat-icon {
-                font-size: 17px;
-                width: 17px;
-                height: 17px;
-                color: #aaa;
-                flex-shrink: 0;
-            }
-
-            span {
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
-            }
-        }
-    }
-
-    .claim-button {
-        width: 100%;
-        height: 44px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        border-radius: 8px !important;
-        margin-top: auto;
-    }
+  .media { position: relative; }
+  .urgency-badge {
+    position: absolute; top: -8px; right: -4px;
+    padding: 6px 12px; border-radius: 16px; font-size: 0.75rem; font-weight: 600;
+    background: #e8f5e9; color: #2e7d32;
+    &.urgent { background: #ffebee; color: #c62828; }
+  }
+  .card-main { flex: 1; }
+  h3 { margin: 0 0 6px; font-size: 1.2rem; color: var(--zp-text); }
+  .food-type { margin: 0 0 14px; color: var(--zp-text-secondary); font-size: 0.875rem; text-transform: capitalize; }
+  .food-details {
+    display: flex; flex-direction: column; gap: 10px;
+    margin-bottom: 18px; padding-bottom: 18px; border-bottom: 1px solid var(--zp-border);
+  }
+  .detail-row {
+    display: flex; align-items: center; gap: 8px; color: var(--zp-text-secondary); font-size: 0.875rem;
+    mat-icon { font-size: 18px; width: 18px; height: 18px; color: var(--zp-text-muted); flex-shrink: 0; }
+    a { color: inherit; text-decoration: underline dotted; &:hover { color: var(--zp-brand); } }
+  }
+  .claim-button { width: 100%; height: 46px; font-size: 1rem; }
 }
 
-.empty-state {
-    text-align: center;
-    padding: 80px 24px;
-
-    mat-icon {
-        display: block;
-        font-size: 80px;
-        width: 80px;
-        height: 80px;
-        color: #ddd;
-        margin: 0 auto 20px;
-    }
-
-    h2 {
-        margin: 0 0 10px;
-        color: #444;
-        font-weight: 600;
-    }
-
-    p {
-        color: #888;
-        margin: 0 0 24px;
-        font-size: 1rem;
-    }
+:host-context(body.dark-theme) .food-card .urgency-badge {
+  background: #1b3a1e; color: #81c784;
+  &.urgent { background: #3d1a1a; color: #e57373; }
 }
 
-@keyframes pulse {
-    0%, 100% { opacity: 1; }
-    50%       { opacity: 0.7; }
+/* ---------- List view ---------- */
+.foods-grid.list-view {
+  grid-template-columns: 1fr;
+  gap: 12px;
+  .food-card { flex-direction: row; align-items: center; gap: 20px; padding: 12px 20px 12px 12px; }
+  .food-card:hover { transform: translateX(4px); }
+  .media { flex: 0 0 140px; }
+  .food-thumb { width: 140px; height: 96px; margin: 0; border-radius: 10px; }
+  .urgency-badge { top: 6px; right: auto; left: 6px; }
+  .card-main { display: grid; grid-template-columns: minmax(180px, 1fr) 2fr; align-items: center; gap: 4px 20px; }
+  h3 { grid-column: 1; grid-row: 1; margin: 0; }
+  .food-type { grid-column: 1; grid-row: 2; margin: 0; }
+  .food-details { grid-column: 2; grid-row: 1 / span 2; flex-direction: row; flex-wrap: wrap; gap: 6px 20px; margin: 0; padding: 0; border: 0; }
+  .claim-button { width: auto; flex-shrink: 0; padding: 0 20px; }
 }
 
 @media (max-width: 768px) {
-    .browse-container { padding: 20px 16px; }
-    .foods-grid { grid-template-columns: 1fr; }
+  .foods-grid { grid-template-columns: 1fr; }
+  .foods-grid.list-view {
+    .food-card { flex-wrap: wrap; }
+    .media { flex-basis: 96px; }
+    .food-thumb { width: 96px; height: 72px; }
+    .card-main { grid-template-columns: 1fr; flex: 1 1 200px; }
+    .food-details { grid-column: 1; grid-row: auto; }
+    .claim-button { width: 100%; }
+  }
 }

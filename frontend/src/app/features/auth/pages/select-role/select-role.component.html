@@ -1,0 +1,41 @@
+<div class="select-role-container">
+    <div class="auth-split">
+    <app-auth-art></app-auth-art>
+    <mat-card class="select-role-card">
+        <div class="logo">
+            <mat-icon>restaurant</mat-icon>
+            <h1>ZeroPlate</h1>
+        </div>
+
+        <h2>Welcome{{ userName ? ', ' + userName : '' }}!</h2>
+        <p class="subtitle">How would you like to use ZeroPlate?</p>
+
+        <div class="role-cards" role="radiogroup" aria-label="Role">
+            <div class="role-card" role="radio" tabindex="0" [attr.aria-checked]="selected === 'donor'"
+                [class.selected]="selected === 'donor'" (click)="select('donor')" (keydown.enter)="select('donor')"
+                (keydown.space)="$event.preventDefault(); select('donor')">
+                <img class="role-art" src="assets/illustrations/donor.svg" alt="" aria-hidden="true" />
+                <h3>Donor</h3>
+                <p>I have surplus food to donate</p>
+            </div>
+
+            <div class="role-card" role="radio" tabindex="0" [attr.aria-checked]="selected === 'receiver'"
+                [class.selected]="selected === 'receiver'" (click)="select('receiver')"
+                (keydown.enter)="select('receiver')" (keydown.space)="$event.preventDefault(); select('receiver')">
+                <img class="role-art" src="assets/illustrations/receiver.svg" alt="" aria-hidden="true" />
+                <h3>Receiver (NGO)</h3>
+                <p>I want to claim food donations</p>
+            </div>
+        </div>
+
+        <button mat-raised-button color="primary" class="full-width confirm-button" (click)="confirm()"
+            [disabled]="!selected || isSaving">
+            @if (isSaving) {
+            <mat-spinner diameter="20"></mat-spinner>
+            } @else {
+            Continue
+            }
+        </button>
+    </mat-card>
+    </div>
+</div>

@@ -1,4 +1,6 @@
 <div class="register-container">
+    <div class="auth-split">
+    <app-auth-art></app-auth-art>
     <mat-card class="register-card">
         <div class="logo">
             <mat-icon>restaurant</mat-icon>
@@ -16,7 +18,7 @@
 
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-label>Full Name</mat-label>
-                        <input matInput formControlName="name" placeholder="John Doe">
+                        <input matInput formControlName="name" placeholder="Jane Doe" autocomplete="name">
                         <mat-icon matPrefix>person</mat-icon>
                         @if (accountForm.get('name')?.hasError('required') && accountForm.get('name')?.touched) {
                         <mat-error>Name is required</mat-error>
@@ -25,7 +27,7 @@
 
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-label>Email</mat-label>
-                        <input matInput type="email" formControlName="email" placeholder="your@email.com">
+                        <input matInput type="email" formControlName="email" placeholder="your@email.com" autocomplete="email">
                         <mat-icon matPrefix>email</mat-icon>
                         @if (accountForm.get('email')?.hasError('required') && accountForm.get('email')?.touched) {
                         <mat-error>Email is required</mat-error>
@@ -37,9 +39,10 @@
 
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-label>Password</mat-label>
-                        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password">
+                        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="password" autocomplete="new-password">
                         <mat-icon matPrefix>lock</mat-icon>
-                        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword">
+                        <button mat-icon-button matSuffix type="button" (click)="hidePassword = !hidePassword"
+                            [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'">
                             <mat-icon>{{ hidePassword ? 'visibility_off' : 'visibility' }}</mat-icon>
                         </button>
                         @if (accountForm.get('password')?.hasError('required') && accountForm.get('password')?.touched)
@@ -52,8 +55,18 @@
                         }
                     </mat-form-field>
 
+                    <mat-form-field appearance="outline" class="full-width">
+                        <mat-label>Confirm password</mat-label>
+                        <input matInput [type]="hidePassword ? 'password' : 'text'" formControlName="confirmPassword"
+                            autocomplete="new-password">
+                        <mat-icon matPrefix>lock_reset</mat-icon>
+                    </mat-form-field>
+                    @if (accountForm.hasError('passwordMismatch') && accountForm.get('confirmPassword')?.touched) {
+                    <p class="form-error">Passwords do not match</p>
+                    }
+
                     <div class="step-actions">
-                        <button mat-raised-button color="primary" matStepperNext [disabled]="accountForm.invalid">
+                        <button mat-raised-button color="primary" matStepperNext type="button" [disabled]="accountForm.invalid">
                             Next
                         </button>
                     </div>
@@ -67,25 +80,31 @@
 
                     <p class="role-description">Choose how you want to participate:</p>
 
-                    <div class="role-cards">
-                        <div class="role-card" [class.selected]="roleForm.get('role')?.value === 'donor'"
-                            (click)="selectRole('donor')">
-                            <mat-icon>storefront</mat-icon>
+                    <div class="role-cards" role="radiogroup" aria-label="Role">
+                        <div class="role-card" role="radio" tabindex="0"
+                            [attr.aria-checked]="roleForm.get('role')?.value === 'donor'"
+                            [class.selected]="roleForm.get('role')?.value === 'donor'"
+                            (click)="selectRole('donor')" (keydown.enter)="selectRole('donor')"
+                            (keydown.space)="$event.preventDefault(); selectRole('donor')">
+                            <img class="role-art" src="assets/illustrations/donor.svg" alt="" aria-hidden="true" />
                             <h3>Donor</h3>
                             <p>I have surplus food to donate</p>
                         </div>
 
-                        <div class="role-card" [class.selected]="roleForm.get('role')?.value === 'receiver'"
-                            (click)="selectRole('receiver')">
-                            <mat-icon>volunteer_activism</mat-icon>
+                        <div class="role-card" role="radio" tabindex="0"
+                            [attr.aria-checked]="roleForm.get('role')?.value === 'receiver'"
+                            [class.selected]="roleForm.get('role')?.value === 'receiver'"
+                            (click)="selectRole('receiver')" (keydown.enter)="selectRole('receiver')"
+                            (keydown.space)="$event.preventDefault(); selectRole('receiver')">
+                            <img class="role-art" src="assets/illustrations/receiver.svg" alt="" aria-hidden="true" />
                             <h3>Receiver (NGO)</h3>
                             <p>I want to claim food donations</p>
                         </div>
                     </div>
 
                     <div class="step-actions">
-                        <button mat-button matStepperPrevious>Back</button>
-                        <button mat-raised-button color="primary" matStepperNext [disabled]="roleForm.invalid">
+                        <button mat-button matStepperPrevious type="button">Back</button>
+                        <button mat-raised-button color="primary" matStepperNext type="button" [disabled]="roleForm.invalid">
                             Next
                         </button>
                     </div>
@@ -97,7 +116,7 @@
                 <form [formGroup]="locationForm">
                     <ng-template matStepLabel>Location</ng-template>
 
-                    <p class="location-description">We use your location to match you with nearby opportunities</p>
+                    <p class="location-description">We use your location to match you with nearby donations and NGOs.</p>
 
                     <mat-form-field appearance="outline" class="full-width">
                         <mat-label>Latitude</mat-label>
@@ -122,8 +141,8 @@
                     </button>
 
                     <div class="step-actions">
-                        <button mat-button matStepperPrevious>Back</button>
-                        <button mat-raised-button color="primary" (click)="onSubmit()"
+                        <button mat-button matStepperPrevious type="button">Back</button>
+                        <button mat-raised-button color="primary" type="button" (click)="onSubmit()"
                             [disabled]="locationForm.invalid || isLoading">
                             @if (isLoading) {
                             <mat-spinner diameter="20"></mat-spinner>
@@ -136,9 +155,18 @@
             </mat-step>
         </mat-stepper>
 
+        <div class="google-signup">
+            <span>or</span>
+            <button mat-stroked-button type="button" (click)="signUpWithGoogle()" class="full-width">
+                <mat-icon>account_circle</mat-icon>
+                Sign up with Google
+            </button>
+        </div>
+
         <div class="login-link">
             Already have an account?
             <a routerLink="/auth/login">Sign in</a>
         </div>
     </mat-card>
+    </div>
 </div>

@@ -2,22 +2,22 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+    background: var(--zp-brand-gradient) !important;
+    color: white;
+}
+
+:host-context(body.dark-theme) .navbar {
+    background: #1e1e2e !important;
 }
 
 .navbar-container {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 16px;
     width: 100%;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 20px;
-}
-
-.navbar-brand {
-    display: flex;
-    align-items: center;
 }
 
 .brand-link {
@@ -26,71 +26,146 @@
     gap: 8px;
     text-decoration: none;
     color: white;
-    font-size: 1.375rem;
+    font-size: 1.4rem;
     font-weight: 700;
-    letter-spacing: -0.3px;
+}
 
-    mat-icon {
-        font-size: 1.6rem;
-        width: 1.6rem;
-        height: 1.6rem;
+.navbar-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+
+    a {
+        color: rgba(255, 255, 255, 0.85);
+
+        &.active {
+            color: white;
+            background: rgba(255, 255, 255, 0.15);
+        }
     }
 }
 
-.brand-name {
-    @media (max-width: 540px) {
+.navbar-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+
+    a, button {
+        color: white;
+    }
+}
+
+.signup-btn {
+    margin-left: 4px;
+}
+
+.mobile-only {
+    display: none !important;
+}
+
+@media (max-width: 860px) {
+    .navbar-links,
+    .desktop-only {
+        display: none !important;
+    }
+
+    .mobile-only {
+        display: inline-flex !important;
+    }
+}
+
+@media (max-width: 420px) {
+    .brand-name {
         display: none;
     }
 }
 
-.navbar-menu {
+.mobile-menu {
+    position: sticky;
+    top: 64px;
+    z-index: 999;
+    background: var(--zp-surface);
+    border-bottom: 1px solid var(--zp-border);
+    box-shadow: var(--zp-shadow);
+    padding: 8px 0;
+    animation: slideDown 0.15s ease-out;
+
+    @media (max-width: 599px) {
+        top: 56px;
+    }
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.mobile-user {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 12px;
+    padding: 8px 20px 12px;
+    border-bottom: 1px solid var(--zp-border);
+    margin-bottom: 4px;
+
+    mat-icon {
+        font-size: 36px;
+        width: 36px;
+        height: 36px;
+        color: var(--zp-brand);
+    }
 }
 
-/* Active nav link indicator */
-a[mat-button].active,
-a[mat-button].active-link {
-    background: rgba(255, 255, 255, 0.18) !important;
-    border-radius: 6px;
-}
+.mobile-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+    padding: 12px 20px;
+    color: var(--zp-text);
+    text-decoration: none;
+    background: none;
+    border: none;
+    font: inherit;
+    cursor: pointer;
+    text-align: left;
 
-a[mat-button] {
-    font-size: 0.9rem;
-    font-weight: 500;
-    color: rgba(255, 255, 255, 0.9);
-    border-radius: 6px;
-    transition: background 0.15s;
-
-    &:hover {
-        background: rgba(255, 255, 255, 0.12) !important;
-        color: white;
+    mat-icon {
+        color: var(--zp-text-secondary);
     }
 
+    &:hover,
     &.active {
-        background: rgba(255, 255, 255, 0.2) !important;
-        color: white;
-        font-weight: 600;
+        background: var(--zp-surface-2);
+    }
+
+    &.active mat-icon {
+        color: var(--zp-brand);
     }
 }
 
-/* Notification & user icon buttons */
-button[mat-icon-button] {
-    color: white;
-    margin-left: 4px;
+.menu-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 8px 8px 16px;
+    min-width: 300px;
+    font-weight: 500;
+    color: var(--zp-text);
 }
 
-/* ── Notification dropdown ── */
 .notification-item {
-    max-width: 320px;
+    max-width: 360px;
     white-space: normal;
     height: auto !important;
-    padding: 12px 16px !important;
-    line-height: 1.4;
-    border-bottom: 1px solid #f5f5f5;
+    min-height: 56px;
+    padding: 12px 16px;
 
-    &:last-child { border-bottom: none; }
+    &.unread {
+        background: rgba(102, 126, 234, 0.08);
+    }
 }
 
 .notification-content {
@@ -101,87 +176,64 @@ button[mat-icon-button] {
 
 .notification-icon {
     flex-shrink: 0;
-    font-size: 22px;
-    width: 22px;
-    height: 22px;
-    margin-top: 2px;
 
-    &.claimCreated  { color: #4caf50; }
-    &.foodExpiring  { color: #ff9800; }
+    &.claimCreated { color: #4caf50; }
+    &.foodClaimed { color: #4caf50; }
+    &.foodExpiring { color: #ff9800; }
     &.pickupReminder { color: #2196f3; }
-    &.foodClaimed   { color: #9c27b0; }
 }
 
-.notification-text { flex: 1; min-width: 0; }
+.notification-text {
+    flex: 1;
+}
 
 .notification-message {
-    margin: 0 0 3px;
-    font-size: 0.85rem;
+    margin: 0;
+    font-size: 0.875rem;
     line-height: 1.4;
-    color: #333;
-    word-break: break-word;
+    color: var(--zp-text);
 }
 
 .notification-time {
     font-size: 0.75rem;
-    color: #999;
+    color: var(--zp-text-secondary);
 }
 
 .no-notifications {
     display: flex;
     align-items: center;
-    gap: 10px;
-    padding: 16px !important;
-    color: #999;
-    font-size: 0.875rem;
+    gap: 12px;
+    padding: 20px 16px;
+    color: var(--zp-text-secondary);
 }
 
-/* ── User menu ── */
 .user-info {
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 14px 16px;
-    border-bottom: 1px solid #f0f0f0;
-    min-width: 200px;
+    padding: 12px 16px;
+    min-width: 220px;
 
     mat-icon {
-        color: #667eea;
-        font-size: 28px;
-        width: 28px;
-        height: 28px;
-        flex-shrink: 0;
+        color: var(--zp-text-secondary);
     }
 }
 
 .user-name {
-    margin: 0 0 2px;
-    font-weight: 600;
-    font-size: 0.95rem;
-    color: #222;
+    margin: 0;
+    font-weight: 500;
+    color: var(--zp-text);
+}
+
+.user-email {
+    margin: 0;
+    font-size: 0.8rem;
+    color: var(--zp-text-secondary);
 }
 
 .user-role {
     margin: 0;
     font-size: 0.8rem;
-    color: #777;
-}
-
-/* ── Mobile ── */
-@media (max-width: 768px) {
-    .navbar-menu {
-        gap: 2px;
-
-        a[mat-button] {
-            font-size: 0.8rem;
-            padding: 0 8px;
-            min-width: unset;
-        }
-    }
-}
-
-@media (max-width: 480px) {
-    .navbar-container {
-        padding: 0 12px;
-    }
+    color: var(--zp-brand);
+    font-weight: 500;
 }

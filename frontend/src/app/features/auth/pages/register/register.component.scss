@@ -3,8 +3,8 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    padding: 32px 16px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    padding: 24px;
+    background: var(--zp-brand-gradient);
 }
 
 .register-card {
@@ -18,9 +18,9 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    margin-bottom: 20px;
-    color: #667eea;
+    gap: 12px;
+    margin-bottom: 24px;
+    color: var(--zp-brand);
 
     mat-icon {
         font-size: 2.25rem;
@@ -45,9 +45,8 @@ h2 {
 
 .subtitle {
     text-align: center;
-    color: #777;
-    margin: 0 0 28px;
-    font-size: 0.9rem;
+    color: var(--zp-text-secondary);
+    margin: 0 0 32px;
 }
 
 /* Stepper spacing */
@@ -63,9 +62,8 @@ mat-form-field {
 .role-description,
 .location-description {
     text-align: center;
-    color: #666;
-    margin: 12px 0 20px;
-    font-size: 0.9rem;
+    color: var(--zp-text-secondary);
+    margin-bottom: 24px;
 }
 
 /* Role selection cards */
@@ -77,38 +75,33 @@ mat-form-field {
 }
 
 .role-card {
-    padding: 20px 16px;
-    border: 2px solid #e0e0e0;
-    border-radius: 12px;
+    padding: 24px;
+    border: 2px solid var(--zp-border);
+    border-radius: 8px;
     text-align: center;
     cursor: pointer;
     transition: all 0.2s;
     background: #fafafa;
 
     &:hover {
-        border-color: #667eea;
-        background: #f5f5ff;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+        border-color: var(--zp-brand);
+        background: var(--zp-surface-2);
     }
 
     &.selected {
-        border-color: #667eea;
-        background: #f0f0ff;
-        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        border-color: var(--zp-brand);
+        background: var(--zp-surface-2);
 
-        mat-icon { color: #667eea; }
-        h3 { color: #667eea; }
+        mat-icon {
+            color: var(--zp-brand);
+        }
     }
 
     mat-icon {
-        display: block;
-        font-size: 2.5rem;
-        width: 2.5rem;
-        height: 2.5rem;
-        margin: 0 auto 10px;
-        color: #aaa;
-        transition: color 0.2s;
+        font-size: 3rem;
+        width: 3rem;
+        height: 3rem;
+        color: var(--zp-text-muted);
     }
 
     h3 {
@@ -120,9 +113,8 @@ mat-form-field {
 
     p {
         margin: 0;
-        font-size: 0.8rem;
-        color: #777;
-        line-height: 1.4;
+        font-size: 0.875rem;
+        color: var(--zp-text-secondary);
     }
 }
 
@@ -137,12 +129,11 @@ mat-form-field {
 
 .login-link {
     text-align: center;
-    margin-top: 20px;
-    color: #777;
-    font-size: 0.9rem;
+    margin-top: 24px;
+    color: var(--zp-text-secondary);
 
     a {
-        color: #667eea;
+        color: var(--zp-brand);
         text-decoration: none;
         font-weight: 600;
         margin-left: 4px;
@@ -150,13 +141,27 @@ mat-form-field {
         &:hover { text-decoration: underline; }
     }
 }
+.form-error {
+    color: #f44336;
+    font-size: 0.8rem;
+    margin: -8px 0 12px 4px;
+}
 
-@media (max-width: 480px) {
-    .register-card {
-        padding: 28px 16px !important;
-    }
+.role-card:focus-visible {
+    outline: 3px solid var(--zp-brand);
+    outline-offset: 2px;
+}
 
-    .role-cards {
-        grid-template-columns: 1fr;
+.google-signup {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    margin-top: 24px;
+
+    span {
+        color: var(--zp-text-muted);
+        font-size: 0.85rem;
+        text-transform: uppercase;
     }
 }

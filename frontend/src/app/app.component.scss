@@ -1,0 +1,28 @@
+.app-container {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.main-content {
+    flex: 1;
+    background-color: var(--zp-bg);
+}
+
+.app-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    font-size: 0.85rem;
+    color: var(--zp-text-secondary);
+    background: var(--zp-surface);
+    border-top: 1px solid var(--zp-border);
+}
+
+@media (max-width: 480px) {
+    .dot {
+        display: none;
+    }
+}

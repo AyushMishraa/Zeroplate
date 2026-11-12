@@ -13,16 +13,44 @@
     gap: 16px;
 
     h1 {
-        margin: 0 0 6px;
-        font-size: 1.875rem;
+        margin: 0 0 8px;
+        font-size: 2rem;
         font-weight: 700;
-        color: #222;
+        color: var(--zp-text);
     }
 
     .subtitle {
         margin: 0;
-        color: #777;
-        font-size: 0.95rem;
+        color: var(--zp-text-secondary);
+        font-size: 1rem;
+    }
+}
+
+.alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    border-radius: 8px;
+    background: #fff3e0;
+    color: #e65100;
+
+    span {
+        flex: 1;
+    }
+
+    a {
+        color: #e65100;
+    }
+}
+
+:host-context(body.dark-theme) .alert-banner {
+    background: rgba(255, 152, 0, 0.15);
+    color: #ffb74d;
+
+    a {
+        color: #ffb74d;
     }
 }
 
@@ -31,6 +59,10 @@
     justify-content: center;
     align-items: center;
     min-height: 400px;
+}
+
+.error-state {
+    padding: 48px 16px;
 }
 
 /* ── Stats grid ── */
@@ -82,17 +114,17 @@
     min-width: 0;
 
     h3 {
-        margin: 0 0 3px;
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: #222;
+        margin: 0 0 4px;
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--zp-text);
         line-height: 1;
     }
 
     p {
         margin: 0;
-        color: #777;
-        font-size: 0.82rem;
+        color: var(--zp-text-secondary);
+        font-size: 0.875rem;
         font-weight: 500;
         text-transform: uppercase;
         letter-spacing: 0.03em;
@@ -100,9 +132,8 @@
 }
 
 /* ── Recent listings ── */
-.recent-listings,
-.impact-card {
-    margin-bottom: 20px;
+.recent-listings {
+    margin-bottom: 24px;
 }
 
 .card-header {
@@ -113,9 +144,9 @@
 
     h2 {
         margin: 0;
-        font-size: 1.25rem;
+        font-size: 1.5rem;
         font-weight: 600;
-        color: #222;
+        color: var(--zp-text);
     }
 }
 
@@ -129,14 +160,15 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
-    background: #f8f9fb;
-    border-radius: 10px;
-    border: 1px solid #f0f0f0;
-    transition: background 0.15s;
+    padding: 16px;
+    background: var(--zp-surface-2);
+    border-radius: 8px;
+    transition: background 0.2s;
     gap: 12px;
 
-    &:hover { background: #f0f2f8; }
+    &:hover {
+        background: var(--zp-surface-3);
+    }
 }
 
 .food-info {
@@ -145,19 +177,14 @@
     gap: 14px;
     flex: 1;
     min-width: 0;
-}
 
-.food-icon {
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-
-    mat-icon { color: white; font-size: 20px; width: 20px; height: 20px; }
+    .food-thumb-sm {
+        width: 64px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 6px;
+        flex-shrink: 0;
+    }
 }
 
 .food-details {
@@ -165,9 +192,9 @@
 
     h4 {
         margin: 0 0 4px;
-        font-size: 0.95rem;
+        font-size: 1rem;
         font-weight: 600;
-        color: #333;
+        color: var(--zp-text);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -177,9 +204,9 @@
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 6px;
-        color: #888;
-        font-size: 0.8rem;
+        gap: 8px;
+        color: var(--zp-text-secondary);
+        font-size: 0.875rem;
         flex-wrap: wrap;
 
         .small-icon {
@@ -188,11 +215,27 @@
             height: 14px;
         }
 
-        .separator { color: #ddd; }
+        .separator {
+            color: var(--zp-text-faint);
+        }
     }
 }
 
-.food-status { flex-shrink: 0; }
+.food-status {
+    flex-shrink: 0;
+}
+
+/* ── Goal card ── */
+.goal-card {
+    margin-bottom: 24px;
+
+    h2 {
+        margin: 0 0 16px;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--zp-text);
+    }
+}
 
 /* ── Empty state ── */
 .empty-state {
@@ -200,16 +243,15 @@
     padding: 48px 24px;
 
     mat-icon {
-        display: block;
         font-size: 64px;
         width: 64px;
         height: 64px;
-        color: #ddd;
-        margin: 0 auto 16px;
+        color: var(--zp-text-faint);
+        margin-bottom: 16px;
     }
 
     p {
-        color: #888;
+        color: var(--zp-text-secondary);
         margin: 0 0 20px;
         font-size: 1rem;
     }
@@ -217,8 +259,9 @@
 
 /* ── Impact card ── */
 .impact-card {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: var(--zp-brand-gradient) !important;
     color: white;
+    margin-bottom: 24px;
 
     h2 {
         margin: 0 0 12px;
@@ -234,7 +277,9 @@
         opacity: 0.92;
         color: white;
 
-        strong { font-weight: 700; }
+        strong {
+            font-weight: 700;
+        }
     }
 
     .impact-visual {
@@ -248,32 +293,59 @@
         align-items: center;
         gap: 10px;
 
-        mat-icon { font-size: 26px; width: 26px; height: 26px; opacity: 0.9; }
-        span { font-size: 1rem; font-weight: 500; }
+        mat-icon {
+            font-size: 26px;
+            width: 26px;
+            height: 26px;
+            opacity: 0.9;
+        }
+
+        span {
+            font-size: 1rem;
+            font-weight: 500;
+        }
     }
 }
 
 /* ── Responsive ── */
 @media (max-width: 768px) {
-    .dashboard-container { padding: 20px 16px; }
+    .dashboard-container {
+        padding: 20px 16px;
+    }
+
+    .dashboard-header {
+        h1 {
+            font-size: 1.5rem;
+        }
+    }
 
     .stats-grid {
         grid-template-columns: repeat(2, 1fr);
         gap: 14px;
     }
 
-    .stat-card { padding: 16px !important; }
+    .stat-card {
+        padding: 16px !important;
+    }
 
     .stat-icon {
         width: 46px;
         height: 46px;
 
-        mat-icon { font-size: 22px; width: 22px; height: 22px; }
+        mat-icon {
+            font-size: 22px;
+            width: 22px;
+            height: 22px;
+        }
     }
 
-    .stat-content h3 { font-size: 1.5rem; }
+    .stat-content h3 {
+        font-size: 1.5rem;
+    }
 }
 
 @media (max-width: 400px) {
-    .stats-grid { grid-template-columns: 1fr; }
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
 }

@@ -5,10 +5,19 @@ import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { catchError, forkJoin, of } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FoodService } from '../../../../core/services/food.service';
 import { ClaimService } from '../../../../core/services/claim.service';
-import { FoodItem, Claim } from '../../../../core/models';
+import { NotifyService } from '../../../../core/services/notify.service';
+import { FoodItem, Claim, isFoodObject } from '../../../../core/models';
+import { co2Saved, expiresLabel, isExpired, isUrgent, timeAgo } from '../../../../shared/utils/date.utils';
+import { foodImage } from '../../../../shared/utils/food-image';
+import { SkeletonComponent } from '../../../../shared/components/skeleton.component';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state.component';
+import { RevealDirective } from '../../../../shared/directives/reveal.directive';
+import { CountUpDirective } from '../../../../shared/directives/count-up.directive';
+
 
 @Component({
   selector: 'app-receiver-dashboard',
@@ -19,16 +28,19 @@ import { FoodItem, Claim } from '../../../../core/models';
     MatCardModule,
     MatButtonModule,
     MatIconModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    SkeletonComponent,
+    EmptyStateComponent,
+    RevealDirective,
+    CountUpDirective
   ],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss'
 })
 export class ReceiverDashboardComponent implements OnInit {
-  userName(): string {
-    return this.authService.currentUser()?.name || 'Receiver';
-  }
+  readonly foodImage = foodImage;
   isLoading = true;
+  loadError = false;
 
   stats = {
     availableFood: 0,
@@ -39,80 +51,91 @@ export class ReceiverDashboardComponent implements OnInit {
   };
 
   nearbyFoods: FoodItem[] = [];
+  urgentCount = 0;
   recentClaims: Claim[] = [];
 
   constructor(
     private authService: AuthService,
     private foodService: FoodService,
-    private claimService: ClaimService
+    private claimService: ClaimService,
+    private notify: NotifyService
   ) { }
+
+  userName(): string {
+    return this.authService.currentUser()?.name || 'Receiver';
+  }
 
   ngOnInit(): void {
     this.loadDashboardData();
   }
 
   loadDashboardData(): void {
-    // Load available foods
-    this.foodService.getAvailableFoods().subscribe({
-      next: (response) => {
-        this.nearbyFoods = Array.isArray(response.food) ? response.food : [];
-        this.stats.availableFood = this.nearbyFoods.length;
-      },
-      error: () => {
-        this.nearbyFoods = [];
-      }
-    });
+    this.isLoading = true;
+    this.loadError = false;
 
-    // Load my claims
-    this.claimService.getMyClaims().subscribe({
-      next: (response) => {
-        this.recentClaims = Array.isArray(response.claims) ? response.claims : [];
-        this.stats.myClaims = this.recentClaims.length;
-        this.stats.pendingPickups = this.recentClaims.filter(c => c.status === 'pending' || c.status === 'approved').length;
-        this.stats.completed = this.recentClaims.filter(c => c.status === 'completed').length;
+    forkJoin({
+      foods: this.foodService.getAvailableFoods().pipe(catchError(() => of(null))),
+      claims: this.claimService.getMyClaims()
+    }).subscribe({
+      next: ({ foods, claims }) => {
+        const available = (foods ?? []).filter(f => !isExpired(f.expirationDate));
+        // Most urgent first so receivers see what needs collecting soonest.
+        this.nearbyFoods = [...available].sort(
+          (a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime()
+        );
+        this.urgentCount = available.filter(f => isUrgent(f.expirationDate)).length;
+        this.stats.availableFood = available.length;
 
-        // Calculate total meals
-        this.stats.totalMealsReceived = this.recentClaims
-          .filter(c => c.status === 'completed')
-          .reduce((sum, claim) => {
-            const food = claim.food as FoodItem;
-            return sum + (food?.quantity || 0);
-          }, 0);
+        this.recentClaims = claims;
+        this.stats.myClaims = claims.length;
+        this.stats.completed = claims.filter(c => this.isDone(c)).length;
+        this.stats.pendingPickups = claims.filter(c =>
+          (c.status === 'pending' || c.status === 'approved') && !this.isDone(c)
+        ).length;
+        this.stats.totalMealsReceived = claims
+          .filter(c => c.status !== 'rejected')
+          .reduce((sum, c) => sum + (isFoodObject(c.food) ? c.food.quantity || 0 : 0), 0);
 
+        if (foods === null) {
+          this.notify.info('Could not load available food right now.');
+        }
         this.isLoading = false;
       },
-      error: () => {
+      error: (error) => {
         this.isLoading = false;
+        this.loadError = true;
+        this.notify.error(error, 'Failed to load your dashboard.');
       }
     });
   }
 
-  formatDate(date: Date): string {
-    const d = new Date(date);
-    const now = new Date();
-    const diffTime = d.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  /** A claim is done when marked completed, or when the donor marked the food picked up. */
+  private isDone(claim: Claim): boolean {
+    return claim.status === 'completed' || (isFoodObject(claim.food) && claim.food.status === 'picked_up');
+  }
 
-    if (diffDays < 0) return 'Expired';
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Tomorrow';
-    if (diffDays < 7) return `in ${diffDays} days`;
+  formatDate(date: Date | string): string {
+    return expiresLabel(date);
+  }
 
-    return d.toLocaleDateString();
+  claimedAgo(date: Date | string): string {
+    return timeAgo(date);
+  }
+
+  isUrgent(food: FoodItem): boolean {
+    return isUrgent(food.expirationDate);
   }
 
   getDonorName(food: FoodItem): string {
-    if (typeof food.donor === 'object') {
-      return food.donor.name;
-    }
-    return 'Unknown';
+    return typeof food.donor === 'object' && food.donor ? food.donor.name : 'Unknown';
   }
 
   getFoodTitle(claim: Claim): string {
-    if (typeof claim.food === 'object') {
-      return claim.food.title;
-    }
-    return 'Food Item';
+    return isFoodObject(claim.food) ? claim.food.title : 'Listing removed';
+  }
+
+  claimStatus(claim: Claim): string {
+    return this.isDone(claim) ? 'completed' : claim.status;
   }
 
   getClaimIcon(status: string): string {
@@ -126,6 +149,6 @@ export class ReceiverDashboardComponent implements OnInit {
   }
 
   calculateCO2Saved(): number {
-    return Math.round(this.stats.totalMealsReceived * 2.5);
+    return co2Saved(this.stats.totalMealsReceived);
   }
 }

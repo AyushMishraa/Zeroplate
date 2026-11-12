@@ -11,48 +11,89 @@
     </div>
 
     @if (isLoading) {
-    <div class="loading-container">
-        <mat-spinner diameter="60"></mat-spinner>
-    </div>
+    <app-skeleton variant="cards" [count]="6"></app-skeleton>
+    } @else if (loadError) {
+    <app-empty-state image="not-found" title="Couldn't load your listings" message="Check your connection and try again.">
+        <button mat-raised-button color="primary" (click)="loadMyFoods()">Try again</button>
+    </app-empty-state>
     } @else {
-    <!-- Filter Chips -->
+    <!-- Filters -->
     <div class="filter-section">
-        <mat-chip-set>
-            <mat-chip [highlighted]="selectedFilter === 'all'" (click)="filterBy('all')">
-                All ({{ getFoodCountByStatus('all') }})
-            </mat-chip>
-            <mat-chip [highlighted]="selectedFilter === 'available'" (click)="filterBy('available')">
-                Available ({{ getFoodCountByStatus('available') }})
-            </mat-chip>
-            <mat-chip [highlighted]="selectedFilter === 'claimed'" (click)="filterBy('claimed')">
-                Claimed ({{ getFoodCountByStatus('claimed') }})
-            </mat-chip>
-            <mat-chip [highlighted]="selectedFilter === 'picked_up'" (click)="filterBy('picked_up')">
-                Picked Up ({{ getFoodCountByStatus('picked_up') }})
-            </mat-chip>
-            <mat-chip [highlighted]="selectedFilter === 'expired'" (click)="filterBy('expired')">
-                Expired ({{ getFoodCountByStatus('expired') }})
-            </mat-chip>
-        </mat-chip-set>
+        <mat-chip-listbox aria-label="Filter by status" [hideSingleSelectionIndicator]="true">
+            @for (status of statusFilters; track status) {
+            <mat-chip-option [selected]="selectedFilter === status" (click)="filterBy(status)">
+                {{ statusLabel(status) }} ({{ getFoodCountByStatus(status) }})
+            </mat-chip-option>
+            }
+        </mat-chip-listbox>
+
+        <div class="toolbar">
+            <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+                <mat-label>Search</mat-label>
+                <mat-icon matPrefix>search</mat-icon>
+                <input matInput [(ngModel)]="searchQuery" (ngModelChange)="applyFilter()"
+                    placeholder="Title, type or address">
+                @if (searchQuery) {
+                <button matSuffix mat-icon-button aria-label="Clear search" (click)="searchQuery = ''; applyFilter()">
+                    <mat-icon>close</mat-icon>
+                </button>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="sort-field" subscriptSizing="dynamic">
+                <mat-label>Sort by</mat-label>
+                <mat-select [(ngModel)]="sortOrder" (ngModelChange)="applyFilter()">
+                    <mat-option value="newest">Newest first</mat-option>
+                    <mat-option value="expiry">Expiring soonest</mat-option>
+                    <mat-option value="quantity">Most servings</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
     </div>
 
     <!-- Foods Grid -->
     @if (filteredFoods.length > 0) {
     <div class="foods-grid">
-        @for (food of filteredFoods; track food._id) {
-        <mat-card class="food-card">
+        @for (food of filteredFoods; track food._id; let i = $index) {
+        <mat-card class="food-card food-card-media" [class.busy]="busyId === food._id" appReveal [revealDelay]="(i % 6) * 70">
+            <img class="food-thumb" [src]="foodImage(food.type)" [alt]="food.type || 'Food'" loading="lazy" />
             <div class="card-header">
                 <span [class]="'status-badge ' + food.status">
-                    {{ food.status | titlecase }}
+                    {{ statusLabel(food.status) }}
                 </span>
-                <button mat-icon-button [matMenuTriggerFor]="menu">
+                @if (isPastExpiry(food)) {
+                <span class="status-badge expired">Past expiry</span>
+                } @else if (isUrgent(food)) {
+                <span class="status-badge pending">Expires soon</span>
+                }
+                <span class="spacer"></span>
+                <button mat-icon-button [matMenuTriggerFor]="menu" aria-label="Listing actions"
+                    [disabled]="busyId === food._id">
                     <mat-icon>more_vert</mat-icon>
                 </button>
-                <mat-menu #menu="matMenu">
+                <mat-menu #menu="matMenu" xPosition="before">
                     <button mat-menu-item (click)="editFood(food)">
                         <mat-icon>edit</mat-icon>
                         <span>Edit</span>
                     </button>
+                    @if (food.status === 'claimed') {
+                    <button mat-menu-item (click)="setStatus(food, 'picked_up')">
+                        <mat-icon>local_shipping</mat-icon>
+                        <span>Mark as picked up</span>
+                    </button>
+                    }
+                    @if (food.status === 'available') {
+                    <button mat-menu-item (click)="setStatus(food, 'expired')">
+                        <mat-icon>event_busy</mat-icon>
+                        <span>Mark as expired</span>
+                    </button>
+                    }
+                    @if (food.status === 'expired') {
+                    <button mat-menu-item (click)="editFood(food)">
+                        <mat-icon>restart_alt</mat-icon>
+                        <span>Relist with new expiry</span>
+                    </button>
+                    }
                     <button mat-menu-item (click)="deleteFood(food)" class="delete-button">
                         <mat-icon>delete</mat-icon>
                         <span>Delete</span>
@@ -61,10 +102,6 @@
             </div>
 
             <div class="card-content">
-                <div class="food-icon">
-                    <mat-icon>restaurant_menu</mat-icon>
-                </div>
-
                 <h3>{{ food.title }}</h3>
 
                 @if (food.type) {
@@ -78,7 +115,7 @@
                     </div>
                     <div class="detail-row">
                         <mat-icon>schedule</mat-icon>
-                        <span>Expires {{ formatDate(food.expirationDate) }}</span>
+                        <span>Expires {{ expiresText(food) }}</span>
                     </div>
                     <div class="detail-row">
                         <mat-icon>place</mat-icon>
@@ -86,34 +123,35 @@
                     </div>
                     <div class="detail-row">
                         <mat-icon>date_range</mat-icon>
-                        <span>Listed {{ formatDate(food.createdAt) }}</span>
+                        <span>Listed {{ listedText(food) }}</span>
                     </div>
                 </div>
+
+                @if (food.status === 'claimed') {
+                <button mat-stroked-button color="primary" class="card-action" (click)="setStatus(food, 'picked_up')"
+                    [disabled]="busyId === food._id">
+                    <mat-icon>local_shipping</mat-icon>
+                    Mark as picked up
+                </button>
+                }
             </div>
         </mat-card>
         }
     </div>
     } @else {
-    <div class="empty-state">
-        <mat-icon>restaurant</mat-icon>
-        <h2>No {{ selectedFilter !== 'all' ? selectedFilter : '' }} food items</h2>
-        <p>
-            @if (selectedFilter === 'all') {
-            You haven't listed any food items yet.
-            } @else {
-            No items with status "{{ selectedFilter }}".
-            }
-        </p>
-        @if (selectedFilter === 'all') {
+    @if (allFoods.length === 0) {
+    <app-empty-state image="empty-plate" title="No listings yet" message="You haven't listed any food items yet.">
         <a mat-raised-button color="primary" routerLink="/donor/add-food">
             Add Your First Item
         </a>
-        } @else {
-        <button mat-raised-button (click)="filterBy('all')">
+    </app-empty-state>
+    } @else {
+    <app-empty-state image="empty-basket" title="No matching listings" message="Nothing matches the current filters.">
+        <button mat-raised-button (click)="searchQuery = ''; filterBy('all')">
             Show All Items
         </button>
-        }
-    </div>
+    </app-empty-state>
+    }
     }
     }
 </div>

@@ -1,140 +1,34 @@
-import { Component, OnInit, Inject } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatMenuModule } from '@angular/material/menu';
-import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
+import { MatSelectModule } from '@angular/material/select';
+import { filter, switchMap } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth.service';
 import { FoodService } from '../../../../core/services/food.service';
-import { FoodItem } from '../../../../core/models';
+import { NotifyService } from '../../../../core/services/notify.service';
+import { FoodItem, FoodStatus } from '../../../../core/models';
+import { ConfirmDialogComponent, ConfirmDialogData } from '../../../../shared/dialogs/confirm-dialog.component';
+import { EditFoodDialogComponent } from '../../../../shared/dialogs/edit-food-dialog.component';
+import { expiresLabel, isExpired, isUrgent, timeAgo } from '../../../../shared/utils/date.utils';
+import { foodImage } from '../../../../shared/utils/food-image';
+import { SkeletonComponent } from '../../../../shared/components/skeleton.component';
+import { EmptyStateComponent } from '../../../../shared/components/empty-state.component';
+import { RevealDirective } from '../../../../shared/directives/reveal.directive';
 
-// ---- Edit Dialog Component ----
-@Component({
-  selector: 'app-edit-food-dialog',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatButtonModule,
-    MatIconModule,
-    MatDatepickerModule,
-    MatNativeDateModule,
-    MatProgressSpinnerModule,
-    MatDialogModule
-  ],
-  template: `
-    <h2 mat-dialog-title>Edit Food Item</h2>
-    <mat-dialog-content>
-      <form [formGroup]="editForm" class="edit-form">
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Food Title</mat-label>
-          <input matInput formControlName="title">
-          <mat-error *ngIf="editForm.get('title')?.hasError('required')">Title is required</mat-error>
-        </mat-form-field>
+type StatusFilter = 'all' | FoodStatus;
+type SortOrder = 'newest' | 'expiry' | 'quantity';
 
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Food Type (Optional)</mat-label>
-          <input matInput formControlName="type" placeholder="e.g., Cooked, Raw, Packaged">
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Quantity (servings)</mat-label>
-          <input matInput type="number" formControlName="quantity">
-          <mat-error *ngIf="editForm.get('quantity')?.hasError('required')">Quantity is required</mat-error>
-          <mat-error *ngIf="editForm.get('quantity')?.hasError('min')">Must be at least 1</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Expiration Date</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="expirationDate" [min]="minDate">
-          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-datepicker #picker></mat-datepicker>
-          <mat-error *ngIf="editForm.get('expirationDate')?.hasError('required')">Date is required</mat-error>
-        </mat-form-field>
-
-        <mat-form-field appearance="outline" class="full-width">
-          <mat-label>Pickup Address</mat-label>
-          <textarea matInput formControlName="pickupLocation" rows="2"></textarea>
-          <mat-error *ngIf="editForm.get('pickupLocation')?.hasError('required')">Location is required</mat-error>
-        </mat-form-field>
-      </form>
-    </mat-dialog-content>
-    <mat-dialog-actions align="end">
-      <button mat-button (click)="onCancel()">Cancel</button>
-      <button mat-raised-button color="primary" (click)="onSave()" [disabled]="editForm.invalid || isSaving">
-        @if (isSaving) {
-          <mat-spinner diameter="20"></mat-spinner>
-        } @else {
-          Save Changes
-        }
-      </button>
-    </mat-dialog-actions>
-  `,
-  styles: [`
-    .edit-form { display: flex; flex-direction: column; gap: 8px; min-width: 400px; padding-top: 8px; }
-    .full-width { width: 100%; }
-    mat-dialog-content { max-height: 70vh; overflow-y: auto; }
-  `]
-})
-export class EditFoodDialogComponent {
-  editForm: FormGroup;
-  isSaving = false;
-  minDate = new Date();
-
-  constructor(
-    private fb: FormBuilder,
-    private foodService: FoodService,
-    private dialogRef: MatDialogRef<EditFoodDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public food: FoodItem
-  ) {
-    this.editForm = this.fb.group({
-      title: [food.title, Validators.required],
-      type: [food.type || ''],
-      quantity: [food.quantity, [Validators.required, Validators.min(1)]],
-      expirationDate: [new Date(food.expirationDate), Validators.required],
-      pickupLocation: [food.pickupLocation, Validators.required]
-    });
-  }
-
-  onCancel(): void {
-    this.dialogRef.close();
-  }
-
-  onSave(): void {
-    if (this.editForm.invalid) return;
-    this.isSaving = true;
-
-    const updates: Partial<FoodItem> = {
-      title: this.editForm.value.title,
-      type: this.editForm.value.type || undefined,
-      quantity: parseInt(this.editForm.value.quantity),
-      expirationDate: this.editForm.value.expirationDate,
-      pickupLocation: this.editForm.value.pickupLocation
-    };
-
-    this.foodService.updateFood(this.food._id, updates).subscribe({
-      next: () => {
-        this.isSaving = false;
-        this.dialogRef.close(true);
-      },
-      error: () => {
-        this.isSaving = false;
-      }
-    });
-  }
-}
+const STATUS_FILTERS: StatusFilter[] = ['all', 'available', 'claimed', 'picked_up', 'expired'];
 
 // ---- Main Component ----
 @Component({
@@ -143,6 +37,7 @@ export class EditFoodDialogComponent {
   imports: [
     CommonModule,
     RouterModule,
+    FormsModule,
     MatCardModule,
     MatButtonModule,
     MatIconModule,
@@ -150,108 +45,194 @@ export class EditFoodDialogComponent {
     MatChipsModule,
     MatMenuModule,
     MatDialogModule,
-    MatSnackBarModule
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    SkeletonComponent,
+    EmptyStateComponent,
+    RevealDirective
   ],
   templateUrl: './my-foods.component.html',
   styleUrl: './my-foods.component.scss'
 })
 export class MyFoodsComponent implements OnInit {
+  readonly statusFilters = STATUS_FILTERS;
+  readonly foodImage = foodImage;
   isLoading = true;
+  loadError = false;
+  busyId: string | null = null;
+
   allFoods: FoodItem[] = [];
   filteredFoods: FoodItem[] = [];
-  selectedFilter: string = 'all';
+  selectedFilter: StatusFilter = 'all';
+  searchQuery = '';
+  sortOrder: SortOrder = 'newest';
 
   constructor(
     private authService: AuthService,
     private foodService: FoodService,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private notify: NotifyService,
+    private route: ActivatedRoute,
+    private router: Router
   ) { }
 
   ngOnInit(): void {
+    const status = this.route.snapshot.queryParamMap.get('status') as StatusFilter | null;
+    if (status && STATUS_FILTERS.includes(status)) {
+      this.selectedFilter = status;
+    }
     this.loadMyFoods();
   }
 
   loadMyFoods(): void {
     const userId = this.authService.getUserId();
+    if (!userId) return;
 
-    this.foodService.getAllFoods().subscribe({
-      next: (response) => {
-        const allFoods = Array.isArray(response.food) ? response.food : [];
-
-        this.allFoods = allFoods.filter(food => {
-          const donorId = typeof food.donor === 'object' ? food.donor._id : food.donor;
-          return donorId === userId;
-        });
-
+    this.loadError = false;
+    this.foodService.getMyFoods(userId).subscribe({
+      next: (foods) => {
+        this.allFoods = foods;
         this.applyFilter();
         this.isLoading = false;
       },
-      error: () => {
+      error: (error) => {
         this.isLoading = false;
-        this.snackBar.open('Failed to load food items', 'Close', { duration: 3000 });
+        this.loadError = true;
+        this.notify.error(error, 'Failed to load your listings.');
       }
     });
   }
 
-  filterBy(status: string): void {
+  filterBy(status: StatusFilter): void {
     this.selectedFilter = status;
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { status: status === 'all' ? null : status },
+      replaceUrl: true
+    });
     this.applyFilter();
   }
 
   applyFilter(): void {
-    if (this.selectedFilter === 'all') {
-      this.filteredFoods = this.allFoods;
-    } else {
-      this.filteredFoods = this.allFoods.filter(food => food.status === this.selectedFilter);
+    let list = this.selectedFilter === 'all'
+      ? [...this.allFoods]
+      : this.allFoods.filter(food => food.status === this.selectedFilter);
+
+    const q = this.searchQuery.trim().toLowerCase();
+    if (q) {
+      list = list.filter(f =>
+        f.title.toLowerCase().includes(q) ||
+        (f.type ?? '').toLowerCase().includes(q) ||
+        (f.pickupLocation ?? '').toLowerCase().includes(q)
+      );
     }
+
+    switch (this.sortOrder) {
+      case 'expiry':
+        list.sort((a, b) => new Date(a.expirationDate).getTime() - new Date(b.expirationDate).getTime());
+        break;
+      case 'quantity':
+        list.sort((a, b) => b.quantity - a.quantity);
+        break;
+      default:
+        list.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    }
+
+    this.filteredFoods = list;
   }
 
-  getFoodCountByStatus(status: string): number {
+  getFoodCountByStatus(status: StatusFilter): number {
     if (status === 'all') return this.allFoods.length;
     return this.allFoods.filter(food => food.status === status).length;
   }
 
-  formatDate(date: Date): string {
-    const d = new Date(date);
-    const now = new Date();
-    const diffTime = d.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  statusLabel(status: StatusFilter): string {
+    switch (status) {
+      case 'all': return 'All';
+      case 'picked_up': return 'Picked up';
+      default: return status.charAt(0).toUpperCase() + status.slice(1);
+    }
+  }
 
-    if (diffDays < 0) return 'Expired';
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Tomorrow';
-    if (diffDays < 7) return `in ${diffDays} days`;
+  expiresText(food: FoodItem): string {
+    return expiresLabel(food.expirationDate);
+  }
 
-    return d.toLocaleDateString();
+  listedText(food: FoodItem): string {
+    return timeAgo(food.createdAt);
+  }
+
+  isUrgent(food: FoodItem): boolean {
+    return food.status === 'available' && isUrgent(food.expirationDate);
+  }
+
+  isPastExpiry(food: FoodItem): boolean {
+    return food.status === 'available' && isExpired(food.expirationDate);
   }
 
   editFood(food: FoodItem): void {
-    const dialogRef = this.dialog.open(EditFoodDialogComponent, {
-      data: food,
-      width: '500px',
-      maxWidth: '95vw'
-    });
+    this.dialog.open(EditFoodDialogComponent, { data: food, autoFocus: 'first-tabbable', maxWidth: '95vw' })
+      .afterClosed()
+      .pipe(filter((updated): updated is FoodItem => !!updated))
+      .subscribe(updated => this.replace(updated));
+  }
 
-    dialogRef.afterClosed().subscribe(saved => {
-      if (saved) {
-        this.snackBar.open('Food item updated successfully', 'Close', { duration: 3000 });
-        this.loadMyFoods();
+  setStatus(food: FoodItem, status: FoodStatus): void {
+    const labels: Record<FoodStatus, string> = {
+      available: 'available again',
+      claimed: 'claimed',
+      picked_up: 'picked up',
+      expired: 'expired'
+    };
+    this.busyId = food._id;
+    this.foodService.updateFood(food._id, { status }).subscribe({
+      next: () => {
+        this.busyId = null;
+        this.replace({ ...food, status });
+        this.notify.success(`"${food.title}" marked as ${labels[status]}`);
+      },
+      error: (error) => {
+        this.busyId = null;
+        this.notify.error(error, 'Could not update the listing.');
       }
     });
   }
 
   deleteFood(food: FoodItem): void {
-    if (confirm(`Are you sure you want to delete "${food.title}"?`)) {
-      this.foodService.deleteFood(food._id).subscribe({
+    const data: ConfirmDialogData = {
+      title: 'Delete listing?',
+      message: `"${food.title}" will be removed permanently. Receivers will no longer see it.`,
+      confirmText: 'Delete',
+      icon: 'delete',
+      danger: true
+    };
+
+    this.dialog.open(ConfirmDialogComponent, { data, width: '420px', maxWidth: '95vw' })
+      .afterClosed()
+      .pipe(
+        filter(Boolean),
+        switchMap(() => {
+          this.busyId = food._id;
+          return this.foodService.deleteFood(food._id);
+        })
+      )
+      .subscribe({
         next: () => {
-          this.snackBar.open('Food item deleted successfully', 'Close', { duration: 3000 });
-          this.loadMyFoods();
+          this.busyId = null;
+          this.allFoods = this.allFoods.filter(f => f._id !== food._id);
+          this.applyFilter();
+          this.notify.success('Listing deleted');
         },
-        error: () => {
-          this.snackBar.open('Failed to delete food item', 'Close', { duration: 3000 });
+        error: (error) => {
+          this.busyId = null;
+          this.notify.error(error, 'Failed to delete the listing.');
         }
       });
-    }
+  }
+
+  private replace(updated: FoodItem): void {
+    this.allFoods = this.allFoods.map(f => (f._id === updated._id ? { ...f, ...updated } : f));
+    this.applyFilter();
   }
 }

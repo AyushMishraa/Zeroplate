@@ -13,16 +13,14 @@
     gap: 16px;
 
     h1 {
-        margin: 0 0 6px;
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: #222;
+        margin: 0 0 8px;
+        font-size: 2rem;
+        color: var(--zp-text);
     }
 
     .subtitle {
         margin: 0;
-        color: #777;
-        font-size: 0.95rem;
+        color: var(--zp-text-secondary);
     }
 }
 
@@ -68,32 +66,34 @@
         margin-bottom: 14px;
 
         mat-icon {
-            font-size: 28px;
-            width: 28px;
-            height: 28px;
-            color: #bbb;
+            font-size: 32px;
+            width: 32px;
+            height: 32px;
+            color: var(--zp-text-muted);
         }
 
         h3 {
             margin: 0;
-            font-size: 1rem;
-            font-weight: 600;
-            color: #555;
+            font-size: 1.125rem;
+            color: var(--zp-text-secondary);
         }
     }
 
     .alert-count {
-        margin: 0 0 6px;
-        font-size: 2.75rem;
-        font-weight: 800;
-        color: #333;
-        line-height: 1;
+        margin: 0 0 8px;
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--zp-text);
+    }
+
+    &.has-alerts .alert-count {
+        color: #f44336;
     }
 
     .alert-description {
         margin: 0;
-        color: #888;
-        font-size: 0.82rem;
+        color: var(--zp-text-secondary);
+        font-size: 0.875rem;
     }
 }
 
@@ -104,11 +104,10 @@
     h2 {
         display: flex;
         align-items: center;
-        gap: 10px;
-        margin: 0 0 14px;
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #333;
+        gap: 12px;
+        margin: 0 0 16px;
+        font-size: 1.5rem;
+        color: var(--zp-text);
 
         mat-icon { color: #f44336; font-size: 22px; width: 22px; height: 22px; }
     }
@@ -133,10 +132,10 @@
 .fraud-item {
     display: flex;
     align-items: flex-start;
-    gap: 14px;
-    padding: 14px 16px;
-    background: #fafafa;
-    border-radius: 10px;
+    gap: 16px;
+    padding: 16px;
+    background: var(--zp-surface-2);
+    border-radius: 8px;
     border-left: 3px solid #f44336;
 
     .warning-icon {
@@ -152,13 +151,15 @@
         flex: 1;
 
         p {
-            margin: 0 0 6px;
-            color: #666;
-            font-size: 0.85rem;
+            margin: 0 0 8px;
+            color: var(--zp-text-secondary);
+            font-size: 0.875rem;
 
             &:last-child { margin-bottom: 0; }
 
-            strong { color: #333; font-weight: 600; }
+            strong {
+                color: var(--zp-text);
+            }
         }
     }
 }
@@ -219,6 +220,59 @@
 }
 
 @media (max-width: 768px) {
-    .fraud-container { padding: 20px 16px; }
-    .alerts-summary { grid-template-columns: 1fr; }
+    .alerts-summary {
+        grid-template-columns: 1fr;
+    }
+}
+.settings-card {
+    padding: 16px 20px;
+    margin-bottom: 24px;
+}
+
+.settings {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+
+    mat-form-field {
+        flex: 1 1 200px;
+    }
+}
+
+.last-checked {
+    color: var(--zp-text-secondary);
+    font-size: 0.85rem;
+}
+
+.id-chip {
+    font-family: monospace;
+    font-size: 0.85rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    border: 1px solid var(--zp-border);
+    background: var(--zp-surface-2);
+    color: var(--zp-text);
+    cursor: pointer;
+}
+
+.empty-state {
+    text-align: center;
+    padding: 48px 16px;
+    color: var(--zp-text-secondary);
+
+    mat-icon {
+        font-size: 48px;
+        width: 48px;
+        height: 48px;
+    }
+
+    button {
+        margin-top: 12px;
+    }
+}
+
+:host-context(body.dark-theme) .detail-card .warning-text {
+    background: rgba(255, 152, 0, 0.12);
+    color: #ffb74d;
 }

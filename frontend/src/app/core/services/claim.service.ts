@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
 import { Claim, ClaimResponse } from '../models';
 
@@ -12,18 +12,18 @@ export class ClaimService {
 
   constructor(private http: HttpClient) {}
 
-  // Create a new claim (receivers only)
+  /** Receivers only. Marks the food as claimed on the backend. */
   createClaim(foodId: string): Observable<ClaimResponse> {
     return this.http.post<ClaimResponse>(this.apiUrl, { foodId });
   }
 
-  // Get all my claims (receivers only)
-  getMyClaims(): Observable<ClaimResponse> {
-    return this.http.get<ClaimResponse>(this.apiUrl);
-  }
-
-  // Get all claims (admin only)
-  getAllClaims(): Observable<ClaimResponse> {
-    return this.http.get<ClaimResponse>(`${this.apiUrl}/all`);
+  /** The signed-in receiver's claims, newest first. `food` is populated, `food.donor` is an id. */
+  getMyClaims(): Observable<Claim[]> {
+    return this.http.get<ClaimResponse>(this.apiUrl).pipe(
+      map(r => (Array.isArray(r?.claims) ? r.claims : [])),
+      map(claims => [...claims].sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      ))
+    );
   }
 }

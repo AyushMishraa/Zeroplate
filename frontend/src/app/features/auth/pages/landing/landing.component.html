@@ -1,94 +1,201 @@
 <div class="landing-page">
-    <!-- Hero Section -->
+    <!-- Hero -->
     <section class="hero">
-        <div class="hero-content">
-            <h1 class="hero-title">
-                <mat-icon class="hero-icon">restaurant</mat-icon>
-                ZeroPlate
-            </h1>
-            <p class="hero-subtitle">Connecting Food Donors with Those in Need</p>
-            <p class="hero-description">
-                Join our mission to reduce food waste by connecting restaurants, supermarkets,
-                and households with NGOs and food banks. Every meal saved makes a difference.
-            </p>
-            <div class="hero-actions">
-                <a mat-raised-button color="primary" routerLink="/auth/register" class="cta-button">
-                    Get Started
-                </a>
-                <a mat-stroked-button routerLink="/auth/login" class="cta-button-secondary">
-                    Sign In
-                </a>
+        <div class="blob b1" aria-hidden="true"></div>
+        <div class="blob b2" aria-hidden="true"></div>
+        <div class="blob b3" aria-hidden="true"></div>
+        <div class="hero-inner">
+            <div class="hero-content">
+                <span class="eyebrow"><mat-icon>eco</mat-icon> Food rescue, made simple</span>
+                <h1 class="hero-title">Share surplus <span class="rotator" aria-live="polite">@for (w of [words[wordIndex()]]; track w) {<span class="rot-word">{{ w }}</span>}</span><br>with people who need it.</h1>
+                <p class="hero-description">
+                    ZeroPlate connects restaurants, supermarkets and households with NGOs and food banks,
+                    so good food gets eaten instead of thrown away.
+                </p>
+                <div class="hero-actions">
+                    @if (isAuthenticated()) {
+                    <a mat-raised-button [routerLink]="dashboardLink()" class="cta-button primary lift">
+                        <mat-icon>dashboard</mat-icon>
+                        Go to my dashboard
+                    </a>
+                    } @else {
+                    <a mat-raised-button routerLink="/auth/register" class="cta-button primary lift">
+                        Get Started <mat-icon iconPositionEnd>arrow_forward</mat-icon>
+                    </a>
+                    <a mat-stroked-button routerLink="/auth/login" class="cta-button secondary">
+                        Sign In
+                    </a>
+                    }
+                </div>
             </div>
+            <div class="hero-art">
+                <img src="assets/illustrations/hero.svg" alt="Hands passing a box of fresh food" width="520" height="440" />
+                <div class="float-chip c1"><mat-icon>schedule</mat-icon> Listed in 30s</div>
+                <div class="float-chip c2"><mat-icon>place</mat-icon> Matched nearby</div>
+            </div>
+        </div>
+        <a class="scroll-cue" href="#roles" aria-label="Scroll to learn more"><mat-icon>expand_more</mat-icon></a>
+    </section>
+
+    <!-- Food categories strip -->
+    <section class="category-strip" aria-label="Food we rescue">
+        <div class="marquee">
+            @for (c of marqueeCategories; track $index) {
+            <div class="cat-pill">
+                <img [src]="c.img" alt="" aria-hidden="true" />
+                <span>{{ c.label }}</span>
+            </div>
+            }
         </div>
     </section>
 
-    <!-- Features Section -->
-    <section class="features">
-        <h2 class="section-title">How It Works</h2>
+    <!-- Roles -->
+    <section class="features" id="roles">
+        <h2 class="section-title" appReveal>One platform, three roles</h2>
         <div class="features-grid">
-            <mat-card class="feature-card">
-                <mat-icon class="feature-icon donor">storefront</mat-icon>
-                <h3>For Donors</h3>
-                <p>List your surplus food quickly and easily. Get matched with nearby NGOs automatically.</p>
+            @for (r of roles; track r.key; let i = $index) {
+            <mat-card class="feature-card" appReveal [revealDelay]="i * 120" appTilt>
+                <img class="role-img" [src]="r.img" [alt]="r.title" />
+                <h3>{{ r.title }}</h3>
+                <p>{{ r.text }}</p>
                 <ul>
-                    <li>Create food listings in seconds</li>
-                    <li>Smart NGO matching by location</li>
-                    <li>Track your impact with analytics</li>
+                    @for (p of r.points; track p) { <li>{{ p }}</li> }
                 </ul>
             </mat-card>
-
-            <mat-card class="feature-card">
-                <mat-icon class="feature-icon receiver">volunteer_activism</mat-icon>
-                <h3>For Receivers (NGOs)</h3>
-                <p>Claim available food donations and coordinate pickups efficiently.</p>
-                <ul>
-                    <li>Browse available food nearby</li>
-                    <li>One-click claiming system</li>
-                    <li>Real-time notifications</li>
-                </ul>
-            </mat-card>
-
-            <mat-card class="feature-card">
-                <mat-icon class="feature-icon admin">admin_panel_settings</mat-icon>
-                <h3>Admin Dashboard</h3>
-                <p>Monitor platform activity, analyze impact, and detect fraud.</p>
-                <ul>
-                    <li>Comprehensive analytics</li>
-                    <li>Fraud detection system</li>
-                    <li>User management tools</li>
-                </ul>
-            </mat-card>
+            }
         </div>
     </section>
 
-    <!-- Impact Section -->
+    <!-- How it works stepper -->
+    <section class="how">
+        <h2 class="section-title" appReveal>How a donation travels</h2>
+        <div class="stepper" appReveal (mouseenter)="pauseSteps(true)" (mouseleave)="pauseSteps(false)">
+            <div class="step-track" role="tablist" aria-label="Donation steps">
+                <div class="track-fill" [style.width.%]="(activeStep() / (steps.length - 1)) * 100"></div>
+                @for (s of steps; track s.title; let i = $index) {
+                <button type="button" class="step-dot" role="tab"
+                    [class.active]="i === activeStep()" [class.done]="i < activeStep()"
+                    [attr.aria-selected]="i === activeStep()" (click)="goStep(i)">
+                    <mat-icon>{{ i < activeStep() ? 'check' : s.icon }}</mat-icon>
+                    <span class="step-label">{{ s.title }}</span>
+                </button>
+                }
+            </div>
+            <div class="step-panel" role="tabpanel">
+                @for (s of steps; track s.title; let i = $index) {
+                @if (i === activeStep()) {
+                <div class="step-body">
+                    <div class="step-icon"><mat-icon>{{ s.icon }}</mat-icon></div>
+                    <div>
+                        <h3>{{ i + 1 }}. {{ s.title }}</h3>
+                        <p>{{ s.text }}</p>
+                    </div>
+                </div>
+                }
+                }
+                <div class="step-nav">
+                    <button mat-icon-button (click)="goStep(activeStep() - 1)" [disabled]="activeStep() === 0" aria-label="Previous step"><mat-icon>chevron_left</mat-icon></button>
+                    <div class="progress-bar">@for (k of [activeStep()]; track k) {<div class="progress" [class.running]="!stepsPaused()"></div>}</div>
+                    <button mat-icon-button (click)="goStep(activeStep() + 1)" aria-label="Next step"><mat-icon>chevron_right</mat-icon></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact -->
     <section class="impact">
-        <h2 class="section-title">Our Impact</h2>
+        @if (impact && impact.listings > 0) {
+        <h2 class="section-title" appReveal>Our impact so far</h2>
         <div class="impact-stats">
-            <div class="stat-card">
-                <mat-icon>restaurant_menu</mat-icon>
-                <h3>10,000+</h3>
-                <p>Meals Saved</p>
+            @for (s of liveStats(); track s.label; let i = $index) {
+            <div class="stat-card" appReveal [revealDelay]="i * 100" revealFrom="zoom">
+                <div class="stat-icon"><mat-icon>{{ s.icon }}</mat-icon></div>
+                <h3 [appCountUp]="s.value" [countSuffix]="s.suffix"></h3>
+                <p>{{ s.label }}</p>
             </div>
-            <div class="stat-card">
-                <mat-icon>people</mat-icon>
-                <h3>500+</h3>
-                <p>Active Users</p>
+            }
+        </div>
+        } @else {
+        <h2 class="section-title" appReveal>Why it matters</h2>
+        <div class="impact-stats">
+            <div class="stat-card" appReveal revealFrom="zoom">
+                <div class="stat-icon"><mat-icon>delete_outline</mat-icon></div>
+                <h3>1 in 3</h3>
+                <p>Meals produced are never eaten</p>
             </div>
-            <div class="stat-card">
-                <mat-icon>eco</mat-icon>
-                <h3>5 Tons</h3>
-                <p>CO₂ Reduced</p>
+            <div class="stat-card" appReveal [revealDelay]="100" revealFrom="zoom">
+                <div class="stat-icon"><mat-icon>schedule</mat-icon></div>
+                <h3>Minutes</h3>
+                <p>To list surplus food</p>
+            </div>
+            <div class="stat-card" appReveal [revealDelay]="200" revealFrom="zoom">
+                <div class="stat-icon"><mat-icon>eco</mat-icon></div>
+                <h3>{{ co2PerMeal }} kg</h3>
+                <p>CO₂ avoided per meal saved (est.)</p>
             </div>
         </div>
+        }
+
+        <!-- Calculator -->
+        <mat-card class="calculator" appReveal>
+            <div class="calc-head">
+                <mat-icon>calculate</mat-icon>
+                <div>
+                    <h3>What could your surplus do?</h3>
+                    <p>Drag to set how many servings you throw away in a typical week.</p>
+                </div>
+            </div>
+            <div class="calc-input">
+                <mat-slider min="5" max="500" step="5" discrete class="calc-slider" aria-label="Servings per week">
+                    <input matSliderThumb [value]="servings()" (valueChange)="servings.set($event)" />
+                </mat-slider>
+                <div class="calc-value"><strong>{{ servings() }}</strong> servings / week</div>
+            </div>
+            <div class="calc-results">
+                <div class="calc-result">
+                    <mat-icon>restaurant</mat-icon>
+                    <strong [appCountUp]="servings() * 52" [countDuration]="500"></strong>
+                    <span>meals a year</span>
+                </div>
+                <div class="calc-result">
+                    <mat-icon>groups</mat-icon>
+                    <strong [appCountUp]="peopleFed()" [countDuration]="500"></strong>
+                    <span>people fed for a day, every week</span>
+                </div>
+                <div class="calc-result">
+                    <mat-icon>eco</mat-icon>
+                    <strong [appCountUp]="yearCo2Tonnes()" [countDecimals]="1" [countSuffix]="' t'" [countDuration]="500"></strong>
+                    <span>CO₂ avoided a year (est.)</span>
+                </div>
+            </div>
+            <p class="calc-note">Estimates assume 3 meals per person per day and {{ co2PerMeal }} kg CO₂ per wasted meal.</p>
+        </mat-card>
     </section>
 
-    <!-- CTA Section -->
+    <!-- FAQ -->
+    <section class="faq">
+        <h2 class="section-title" appReveal>Questions people ask</h2>
+        <mat-accordion class="faq-list" appReveal>
+            @for (f of faqs; track f.q; let first = $first) {
+            <mat-expansion-panel [expanded]="first">
+                <mat-expansion-panel-header>
+                    <mat-panel-title>{{ f.q }}</mat-panel-title>
+                </mat-expansion-panel-header>
+                <p>{{ f.a }}</p>
+            </mat-expansion-panel>
+            }
+        </mat-accordion>
+    </section>
+
+    <!-- CTA -->
+    @if (!isAuthenticated()) {
     <section class="cta-section">
-        <h2>Ready to Make a Difference?</h2>
-        <p>Join ZeroPlate today and help us fight food waste together.</p>
-        <a mat-raised-button color="accent" routerLink="/auth/register" class="cta-button-large">
+        <div class="blob b2" aria-hidden="true"></div>
+        <h2 appReveal>Ready to make a difference?</h2>
+        <p appReveal [revealDelay]="100">Join ZeroPlate today and help us fight food waste together.</p>
+        <a mat-raised-button routerLink="/auth/register" class="cta-button-large lift" appReveal [revealDelay]="200">
             Sign Up Now
         </a>
     </section>
+    }
 </div>

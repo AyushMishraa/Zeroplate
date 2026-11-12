@@ -2,6 +2,10 @@
     <div class="dashboard-header">
         <h1>Admin Dashboard</h1>
         <div class="header-actions">
+            <button mat-stroked-button (click)="refresh()" [disabled]="isLoading">
+                <mat-icon>refresh</mat-icon>
+                Refresh
+            </button>
             <a mat-raised-button routerLink="/admin/analytics">
                 <mat-icon>analytics</mat-icon>
                 Analytics
@@ -14,112 +18,143 @@
     </div>
 
     @if (isLoading) {
-    <div class="loading-container">
-        <mat-spinner diameter="60"></mat-spinner>
+    <app-skeleton variant="stats" [count]="4"></app-skeleton>
+    <app-skeleton variant="table" [count]="3"></app-skeleton>
+    } @else if (loadError) {
+    <div class="empty-state">
+        <mat-icon>cloud_off</mat-icon>
+        <p>Couldn't load dashboard statistics.</p>
+        <button mat-raised-button color="primary" (click)="refresh()">Try again</button>
     </div>
     } @else {
     <!-- Stats Grid -->
     <div class="stats-grid">
-        <mat-card class="stat-card">
+        <mat-card class="stat-card" appReveal>
             <div class="stat-icon users">
                 <mat-icon>people</mat-icon>
             </div>
             <div class="stat-content">
-                <h3>{{ stats?.totalUsers || 0 }}</h3>
+                <h3 [appCountUp]="stats?.totalUsers || 0"></h3>
                 <p>Total Users</p>
             </div>
         </mat-card>
 
-        <mat-card class="stat-card">
+        <mat-card class="stat-card" appReveal>
             <div class="stat-icon food">
                 <mat-icon>restaurant</mat-icon>
             </div>
             <div class="stat-content">
-                <h3>{{ stats?.totalFoodItems || 0 }}</h3>
+                <h3 [appCountUp]="stats?.totalFoodItems || 0"></h3>
                 <p>Food Items Listed</p>
             </div>
         </mat-card>
 
-        <mat-card class="stat-card">
+        <mat-card class="stat-card" appReveal>
             <div class="stat-icon claims">
                 <mat-icon>shopping_basket</mat-icon>
             </div>
             <div class="stat-content">
-                <h3>{{ stats?.totalClaims || 0 }}</h3>
+                <h3 [appCountUp]="stats?.totalClaims || 0"></h3>
                 <p>Total Claims</p>
             </div>
         </mat-card>
 
-        <mat-card class="stat-card">
+        <mat-card class="stat-card" appReveal>
             <div class="stat-icon pending">
                 <mat-icon>pending</mat-icon>
             </div>
             <div class="stat-content">
-                <h3>{{ stats?.pendingPickups || 0 }}</h3>
+                <h3 [appCountUp]="stats?.pendingPickups || 0"></h3>
                 <p>Pending Pickups</p>
             </div>
         </mat-card>
 
-        <mat-card class="stat-card">
+        <mat-card class="stat-card" appReveal>
             <div class="stat-icon success">
                 <mat-icon>check_circle</mat-icon>
             </div>
             <div class="stat-content">
-                <h3>{{ stats?.successfulPickups || 0 }}</h3>
+                <h3 [appCountUp]="stats?.successfulPickups || 0"></h3>
                 <p>Successful Pickups</p>
             </div>
         </mat-card>
 
-        <mat-card class="stat-card">
+        <mat-card class="stat-card" appReveal>
             <div class="stat-icon expired">
                 <mat-icon>warning</mat-icon>
             </div>
             <div class="stat-content">
-                <h3>{{ stats?.expiredFood || 0 }}</h3>
+                <h3 [appCountUp]="stats?.expiredFood || 0"></h3>
                 <p>Expired Food</p>
             </div>
         </mat-card>
     </div>
 
-    <!-- Food by Type Chart -->
-    @if (stats?.foodByType) {
-    <mat-card class="chart-card">
-        <h2>Food Distribution by Type</h2>
-        <div class="food-type-list">
-            @for (type of stats?.foodByType; track type._id) {
-            <div class="type-item">
-                <span class="type-name">{{ type._id || 'Unknown' }}</span>
-                <div class="type-bar">
-                    <div class="type-fill" [style.width.%]="getPercentage(type.count)"></div>
-                </div>
-                <span class="type-count">{{ type.count }}</span>
+    <!-- Charts -->
+    <div class="charts-grid">
+        <mat-card class="chart-card" appReveal>
+            <h2>Donations in the Last 7 Days</h2>
+            @if (hasDailyData) {
+            <app-chart type="bar" [labels]="dailyLabels" [datasets]="dailyDatasets" [showLegend]="true"
+                ariaLabel="Listings and servings per day for the last 7 days"></app-chart>
+            } @else {
+            <div class="empty-state small">
+                <mat-icon>bar_chart</mat-icon>
+                <p>No donations in the last 7 days</p>
             </div>
             }
-        </div>
-    </mat-card>
-    }
+        </mat-card>
+
+        <mat-card class="chart-card" appReveal>
+            <h2>Food Distribution by Type</h2>
+            @if (stats?.foodByType?.length) {
+            <app-chart type="doughnut" [labels]="typeLabels" [datasets]="typeDatasets" [height]="220"
+                ariaLabel="Share of listings by food type"></app-chart>
+            <div class="food-type-list">
+                @for (type of stats?.foodByType; track type._id) {
+                <div class="type-item">
+                    <span class="type-name">{{ type._id || 'Unspecified' }}</span>
+                    <div class="type-bar">
+                        <div class="type-fill" [style.width.%]="getPercentage(type.count)"></div>
+                    </div>
+                    <span class="type-count">{{ type.count }}</span>
+                </div>
+                }
+            </div>
+            } @else {
+            <div class="empty-state small">
+                <mat-icon>pie_chart</mat-icon>
+                <p>No listings yet</p>
+            </div>
+            }
+        </mat-card>
+    </div>
 
     <!-- Pending Pickups Table -->
     <mat-card class="table-card">
         <div class="card-header">
             <h2>Pending Pickups ({{ pendingPickups.length }})</h2>
         </div>
-        @if (pendingPickups.length > 0) {
+        @if (pickupsLoading) {
+        <div class="loading-container small">
+            <mat-spinner diameter="40"></mat-spinner>
+        </div>
+        } @else if (pendingPickups.length > 0) {
         <div class="table-container">
             <table mat-table [dataSource]="pendingPickups" class="pickups-table">
                 <ng-container matColumnDef="food">
                     <th mat-header-cell *matHeaderCellDef>Food Item</th>
-                    <td mat-cell *matCellDef="let pickup">{{ pickup.food.title }}</td>
+                    <td mat-cell *matCellDef="let pickup">{{ pickup.food?.title || 'Removed listing' }}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="donor">
                     <th mat-header-cell *matHeaderCellDef>Donor</th>
-                    <td mat-cell *matCellDef="let pickup">{{ pickup.food.donor.name }}</td>
+                    <td mat-cell *matCellDef="let pickup">{{ pickup.food?.donor?.name || 'Unknown' }}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="receiver">
                     <th mat-header-cell *matHeaderCellDef>Receiver</th>
-                    <td mat-cell *matCellDef="let pickup">{{ pickup.receiver.name }}</td>
+                    <td mat-cell *matCellDef="let pickup">{{ pickup.receiver?.name || 'Unknown' }}</td>
                 </ng-container>
 
                 <ng-container matColumnDef="status">

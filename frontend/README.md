@@ -1,162 +1,38 @@
-# 🍽️ ZeroPlate Frontend - Angular 17+ Application
+# ZeroPlate Frontend (Angular 17)
 
-A modern, production-ready Angular 17+ frontend for the ZeroPlate food waste reduction platform.
+Angular 17 standalone-component SPA for ZeroPlate. It talks to the Express API in `../backend`.
 
-## 🚀 Features
+## Run it
 
-### ✅ **Authentication & Authorization**
-- Email/Password login and registration
-- Google OAuth 2.0 integration
-- Multi-step registration with role selection
-- Geolocation support for user location
-- JWT-based authentication with HTTP interceptors
-- Role-based route guards (Donor, Receiver, Admin)
-
-### 🍲 **Donor Features**
-- **Dashboard**: View statistics, active listings, and impact metrics
-- **Add Food**: Create food listings with location and expiration dates
-- **My Foods**: Manage all food listings with status filtering
-- Real-time NGO matching recommendations
-- Track total meals saved and CO₂ reduction
-
-### 🏢 **Receiver (NGO) Features**
-- **Dashboard**: Browse available food and track claims
-- **Browse Food**: Search and filter available donations with urgency indicators
-- **My Claims**: Track claim status (pending, approved, completed)
-- One-click food claiming system
-- View donor information and pickup locations
-
-### 👨‍💼 **Admin Features**
-- **Dashboard**: Comprehensive platform statistics and metrics
-- **Analytics**: Platform-wide analytics, top donors leaderboard
-- **Fraud Detection**: Monitor suspicious activity, duplicate claims, rapid claims
-- Pending pickups management
-- Food distribution by type visualization
-
-### 🔔 **Real-time Features**
-- Socket.IO integration for live notifications
-- Real-time claim updates
-- Food expiry alerts
-- Pickup reminders
-
-## 📋 Prerequisites
-
-- **Node.js** v18 or higher
-- **npm** v8 or higher
-- **Angular CLI** v17 or higher
-
-## 🛠️ Installation
-
-1. **Navigate to the frontend directory**
-```bash
-cd frontend/zeroplate-app
-```
-
-2. **Install dependencies**
 ```bash
 npm install
+npm start          # http://localhost:4200
+npm run build      # production build (uses src/environments/environment.prod.ts)
+npm test           # Karma + Jasmine unit tests
 ```
 
-3. **Configure environment**
+The API location is set in `src/environments/environment.ts` (`http://localhost:5000/api`), so start the backend with `PORT=5000`. The backend's CORS only allows `http://localhost:4200`.
 
-Update `src/environments/environment.ts`:
-```typescript
-export const environment = {
-  production: false,
-  apiUrl: 'http://localhost:5000/api',
-  socketUrl: 'http://localhost:5000'
-};
-```
+## What's in the app
 
-## 🚀 Development Server
+| Role | Pages |
+|------|-------|
+| Everyone | Landing page with live platform stats, login, multi-step registration, Google sign-in, role selection for new Google users, 404 page |
+| Donor | Dashboard (stats, expiring-soon alert, impact), Add Food (type, servings, expiry date and time, optional coordinates, matched NGOs), My Foods (search, sort, status filters, edit, mark picked up or expired, delete) |
+| Receiver | Dashboard (expiring-soonest list, claim stats), Browse Food (search, type and urgency filters, sort, claim with confirmation), My Claims (status filters, donor names, map links) |
+| Admin | Dashboard (stats, 7-day donations chart, food-type chart, pending pickups), Analytics (summary, claim rate, charts, top donors), Fraud Detection (configurable rules, duplicate/rapid/suspicious reports) |
 
-```bash
-npm start
-```
+Shared: light/dark theme toggle (saved per browser, follows the OS until chosen), responsive navbar with a mobile menu, real-time notifications over Socket.IO (kept per user), snackbar feedback, loading, empty and error states on every page.
 
-Navigate to `http://localhost:4200/`
+## Structure
 
-## 🏗️ Build
+- `src/app/core/` services (one per backend area plus `theme`, `notify`, `socket`), functional guards, the auth interceptor and shared models.
+- `src/app/features/<area>/pages/<page>/` lazy-loaded pages, wired up in `app.routes.ts`.
+- `src/app/shared/` navbar, chart wrapper (Chart.js), dialogs (confirm, edit listing) and date/food helpers.
+- `src/styles.scss` Material light and dark themes plus `--zp-*` colour tokens. Component styles use the tokens so dark mode works everywhere.
 
-```bash
-ng build --configuration production
-```
+## Auth notes
 
-## 📁 Project Structure
-
-```
-src/app/
-├── core/              # Services, guards, interceptors, models
-├── features/          # Feature modules (auth, donor, receiver, admin)
-├── shared/            # Shared components
-├── app.component.ts
-├── app.config.ts
-└── app.routes.ts
-```
-
-## 🔐 User Roles & Routes
-
-**Donor Routes** (Protected by donorGuard):
-- `/donor/dashboard` - View stats and recent listings
-- `/donor/add-food` - Create new food donation
-- `/donor/my-foods` - Manage all food listings
-
-**Receiver Routes** (Protected by receiverGuard):
-- `/receiver/dashboard` - View available food and claims
-- `/receiver/browse-food` - Search and claim food
-- `/receiver/my-claims` - Track claimed items
-
-**Admin Routes** (Protected by adminGuard):
-- `/admin/dashboard` - Platform statistics
-- `/admin/analytics` - Detailed analytics & top donors
-- `/admin/fraud` - Fraud detection system
-
-## 🎨 Tech Stack
-
-- **Angular 17** with standalone components
-- **Angular Material 17** for UI components
-- **Socket.IO Client** for real-time notifications
-- **RxJS** for reactive programming
-- **TypeScript 5.4**
-- **SCSS** for styling
-
-## 🔧 Key Services
-
-- `AuthService` - Authentication & user management
-- `FoodService` - Food item CRUD operations
-- `ClaimService` - Claim management
-- `AdminService` - Admin dashboard data
-- `AnalyticsService` - Platform analytics
-- `SocketService` - Real-time notifications
-
-## 📱 Responsive Design
-
-- Mobile-first approach
-- Breakpoints: 600px (mobile), 960px (tablet)
-- Fully responsive components
-
-## 🛡️ Security
-
-- JWT token authentication
-- HTTP interceptors for auto-token attachment
-- Route guards for access control
-- Angular's built-in XSS protection
-
-## 🐛 Troubleshooting
-
-**CORS Issues**:
-Ensure backend CORS allows `http://localhost:4200`
-
-**Socket.IO Connection**:
-Verify `socketUrl` matches your backend
-
-**Dependencies**:
-Use `npm install --legacy-peer-deps` if needed
-
-## 📄 License
-
-ISC
-
----
-
-**Built with ❤️ using Angular 17+**
+- Email/password login returns a JWT, stored as `zp_token` and sent as a Bearer header.
+- Google sign-in only sets an httpOnly cookie on the API, so API calls are sent `withCredentials` and the session works without a stored token.
+- Any 401 from a protected endpoint ends the session and returns to login with the original URL.

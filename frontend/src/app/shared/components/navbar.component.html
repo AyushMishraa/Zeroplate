@@ -1,55 +1,81 @@
 <mat-toolbar color="primary" class="navbar">
     <div class="navbar-container">
-        <div class="navbar-brand">
-            <a routerLink="/" class="brand-link">
-                <mat-icon>restaurant</mat-icon>
-                <span class="brand-name">ZeroPlate</span>
-            </a>
-        </div>
+        <a [routerLink]="homeLink()" class="brand-link" aria-label="ZeroPlate home">
+            <mat-icon>restaurant</mat-icon>
+            <span class="brand-name">ZeroPlate</span>
+        </a>
 
-        <div class="navbar-menu">
-            @if (isAuthenticated()) {
-            @if (userRole() === 'donor') {
-            <a mat-button routerLink="/donor/dashboard" routerLinkActive="active">Dashboard</a>
-            <a mat-button routerLink="/donor/add-food" routerLinkActive="active">Add Food</a>
-            <a mat-button routerLink="/donor/my-foods" routerLinkActive="active">My Foods</a>
+        <nav class="navbar-links" aria-label="Main">
+            @for (link of links(); track link.path) {
+            <a mat-button [routerLink]="link.path" routerLinkActive="active">{{ link.label }}</a>
             }
+        </nav>
 
-            @if (userRole() === 'receiver') {
-            <a mat-button routerLink="/receiver/dashboard" routerLinkActive="active">Dashboard</a>
-            <a mat-button routerLink="/receiver/browse-food" routerLinkActive="active">Browse Food</a>
-            <a mat-button routerLink="/receiver/my-claims" routerLinkActive="active">My Claims</a>
-            }
-
-            @if (userRole() === 'admin') {
-            <a mat-button routerLink="/admin/dashboard" routerLinkActive="active">Dashboard</a>
-            <a mat-button routerLink="/admin/analytics" routerLinkActive="active">Analytics</a>
-            <a mat-button routerLink="/admin/fraud" routerLinkActive="active">Fraud Detection</a>
-            }
-
-            <button mat-icon-button [matMenuTriggerFor]="notificationMenu" [matBadge]="notificationCount()"
-                matBadgeColor="warn" [matBadgeHidden]="notificationCount() === 0">
-                <mat-icon>notifications</mat-icon>
+        <div class="navbar-actions">
+            <button mat-icon-button (click)="toggleTheme()"
+                [matTooltip]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'"
+                [attr.aria-label]="isDarkMode() ? 'Switch to light mode' : 'Switch to dark mode'">
+                <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
             </button>
 
-            <button mat-icon-button [matMenuTriggerFor]="userMenu">
+            @if (isAuthenticated()) {
+            <button mat-icon-button [matMenuTriggerFor]="notificationMenu" (menuOpened)="onNotificationsOpened()"
+                aria-label="Notifications" matTooltip="Notifications">
+                <mat-icon [matBadge]="unreadCount()" matBadgeColor="warn" matBadgeSize="small"
+                    [matBadgeHidden]="unreadCount() === 0" aria-hidden="false">notifications</mat-icon>
+            </button>
+
+            <button mat-icon-button [matMenuTriggerFor]="userMenu" aria-label="Account menu" class="desktop-only">
                 <mat-icon>account_circle</mat-icon>
+            </button>
+
+            <button mat-icon-button class="mobile-only" (click)="toggleMobileMenu()"
+                [attr.aria-expanded]="mobileMenuOpen" aria-label="Open menu">
+                <mat-icon>{{ mobileMenuOpen ? 'close' : 'menu' }}</mat-icon>
             </button>
             } @else {
             <a mat-button routerLink="/auth/login">Login</a>
-            <a mat-raised-button color="accent" routerLink="/auth/register">Sign Up</a>
+            <a mat-raised-button color="accent" routerLink="/auth/register" class="signup-btn">Sign Up</a>
             }
         </div>
     </div>
 </mat-toolbar>
 
-<mat-menu #notificationMenu="matMenu">
+@if (isAuthenticated() && mobileMenuOpen) {
+<div class="mobile-menu" role="menu">
+    <div class="mobile-user">
+        <mat-icon>account_circle</mat-icon>
+        <div>
+            <p class="user-name">{{ userName() }}</p>
+            <p class="user-role">{{ userRole() | titlecase }}</p>
+        </div>
+    </div>
+    @for (link of links(); track link.path) {
+    <a class="mobile-link" [routerLink]="link.path" routerLinkActive="active">
+        <mat-icon>{{ link.icon }}</mat-icon>
+        <span>{{ link.label }}</span>
+    </a>
+    }
+    <button class="mobile-link" type="button" (click)="logout()">
+        <mat-icon>logout</mat-icon>
+        <span>Logout</span>
+    </button>
+</div>
+}
+
+<mat-menu #notificationMenu="matMenu" xPosition="before" class="notification-panel">
+    <div class="menu-header" (click)="$event.stopPropagation()">
+        <span>Notifications</span>
+        @if (notifications().length > 0) {
+        <button mat-button color="primary" (click)="clearNotifications($event)">Clear all</button>
+        }
+    </div>
+    <mat-divider></mat-divider>
     @if (notifications().length > 0) {
-    @for (notification of notifications(); track notification.timestamp) {
-    <div mat-menu-item class="notification-item">
+    @for (notification of notifications(); track notification.id) {
+    <div mat-menu-item class="notification-item" [class.unread]="!notification.read">
         <div class="notification-content">
-            <mat-icon [class]="'notification-icon ' + notification.type">{{ getNotificationIcon(notification.type)
-                }}</mat-icon>
+            <mat-icon [class]="'notification-icon ' + notification.type">{{ getNotificationIcon(notification.type) }}</mat-icon>
             <div class="notification-text">
                 <p class="notification-message">{{ notification.message }}</p>
                 <span class="notification-time">{{ formatTime(notification.timestamp) }}</span>
@@ -58,22 +84,31 @@
     </div>
     }
     } @else {
-    <div mat-menu-item class="no-notifications">
+    <div class="no-notifications" (click)="$event.stopPropagation()">
         <mat-icon>notifications_none</mat-icon>
-        <span>No new notifications</span>
+        <span>You're all caught up</span>
     </div>
     }
 </mat-menu>
 
-<mat-menu #userMenu="matMenu">
-    <div class="user-info">
+<mat-menu #userMenu="matMenu" xPosition="before">
+    <div class="user-info" (click)="$event.stopPropagation()">
         <mat-icon>person</mat-icon>
         <div>
             <p class="user-name">{{ userName() }}</p>
-            <p class="user-role">{{ (userRole() || '') | titlecase }}</p>
+            <p class="user-email">{{ userEmail() }}</p>
+            <p class="user-role">{{ userRole() | titlecase }}</p>
         </div>
     </div>
     <mat-divider></mat-divider>
+    <button mat-menu-item [routerLink]="homeLink()">
+        <mat-icon>dashboard</mat-icon>
+        <span>My dashboard</span>
+    </button>
+    <button mat-menu-item (click)="toggleTheme()">
+        <mat-icon>{{ isDarkMode() ? 'light_mode' : 'dark_mode' }}</mat-icon>
+        <span>{{ isDarkMode() ? 'Light mode' : 'Dark mode' }}</span>
+    </button>
     <button mat-menu-item (click)="logout()">
         <mat-icon>logout</mat-icon>
         <span>Logout</span>

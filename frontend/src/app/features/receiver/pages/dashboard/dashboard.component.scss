@@ -13,16 +13,14 @@
     gap: 16px;
 
     h1 {
-        margin: 0 0 6px;
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: #222;
+        margin: 0 0 8px;
+        font-size: 2rem;
+        color: var(--zp-text);
     }
 
     .subtitle {
         margin: 0;
-        color: #777;
-        font-size: 0.95rem;
+        color: var(--zp-text-secondary);
     }
 }
 
@@ -70,30 +68,37 @@
         color: white;
     }
 
-    &.available  { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
-    &.claimed    { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); }
-    &.pending    { background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%); }
-    &.completed  { background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); }
+    &.available {
+        background: var(--zp-brand-gradient);
+    }
+
+    &.claimed {
+        background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    }
+
+    &.pending {
+        background: linear-gradient(135deg, #ffa726 0%, #fb8c00 100%);
+    }
+
+    &.completed {
+        background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+    }
 }
 
 .stat-content {
     min-width: 0;
 
     h3 {
-        margin: 0 0 3px;
-        font-size: 1.875rem;
-        font-weight: 700;
-        color: #222;
-        line-height: 1;
+        margin: 0 0 4px;
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--zp-text);
     }
 
     p {
         margin: 0;
-        color: #777;
-        font-size: 0.82rem;
-        font-weight: 500;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
+        color: var(--zp-text-secondary);
+        font-size: 0.875rem;
     }
 }
 
@@ -107,9 +112,8 @@
 
     h2 {
         margin: 0;
-        font-size: 1.25rem;
-        font-weight: 600;
-        color: #222;
+        font-size: 1.5rem;
+        color: var(--zp-text);
     }
 }
 
@@ -124,14 +128,14 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
-    background: #f8f9fb;
-    border-radius: 10px;
-    border: 1px solid #f0f0f0;
-    gap: 12px;
-    transition: background 0.15s;
+    padding: 16px;
+    background: var(--zp-surface-2);
+    border-radius: 8px;
+    transition: background 0.2s;
 
-    &:hover { background: #f0f2f8; }
+    &:hover {
+        background: var(--zp-surface-3);
+    }
 }
 
 .food-info {
@@ -143,10 +147,10 @@
 }
 
 .food-icon {
-    width: 44px;
-    height: 44px;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    border-radius: 10px;
+    width: 48px;
+    height: 48px;
+    background: var(--zp-brand-gradient);
+    border-radius: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -160,25 +164,27 @@
 
     h4 {
         margin: 0 0 4px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #333;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 1rem;
+        color: var(--zp-text);
     }
 
     .food-meta {
         margin: 0;
         display: flex;
         align-items: center;
-        gap: 6px;
-        color: #888;
-        font-size: 0.8rem;
-        flex-wrap: wrap;
+        gap: 8px;
+        color: var(--zp-text-secondary);
+        font-size: 0.875rem;
 
-        .small-icon { font-size: 14px; width: 14px; height: 14px; }
-        .separator { color: #ddd; }
+        .small-icon {
+            font-size: 16px;
+            width: 16px;
+            height: 16px;
+        }
+
+        .separator {
+            color: var(--zp-text-faint);
+        }
     }
 }
 
@@ -186,11 +192,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 14px 16px;
-    background: #f8f9fb;
-    border-radius: 10px;
-    border: 1px solid #f0f0f0;
-    gap: 12px;
+    padding: 16px;
+    background: var(--zp-surface-2);
+    border-radius: 8px;
 }
 
 .claim-info {
@@ -217,20 +221,47 @@
 
     h4 {
         margin: 0 0 4px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        color: #333;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
+        font-size: 1rem;
+        color: var(--zp-text);
     }
 
     .claim-meta {
         margin: 0;
-        color: #888;
-        font-size: 0.8rem;
+        color: var(--zp-text-secondary);
+        font-size: 0.875rem;
 
-        .separator { margin: 0 6px; color: #ddd; }
+        .separator {
+            margin: 0 8px;
+            color: var(--zp-text-faint);
+        }
+    }
+}
+
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 16px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    text-transform: uppercase;
+
+    &.pending {
+        background: #fff3e0;
+        color: #e65100;
+    }
+
+    &.approved {
+        background: #e8f5e9;
+        color: #2e7d32;
+    }
+
+    &.completed {
+        background: #e3f2fd;
+        color: #1565c0;
+    }
+
+    &.rejected {
+        background: #ffebee;
+        color: #c62828;
     }
 }
 
@@ -243,13 +274,13 @@
         font-size: 64px;
         width: 64px;
         height: 64px;
-        color: #ddd;
-        margin: 0 auto 16px;
+        color: var(--zp-text-faint);
+        margin-bottom: 16px;
     }
 
     p {
-        color: #888;
-        margin: 0 0 20px;
+        color: var(--zp-text-secondary);
+        margin: 0 0 24px;
         font-size: 1rem;
     }
 }
@@ -291,11 +322,38 @@
 }
 
 @media (max-width: 768px) {
-    .dashboard-container { padding: 20px 16px; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 14px; }
-    .stat-card { padding: 16px !important; }
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+.alert-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    margin-bottom: 24px;
+    border-radius: 8px;
+    background: #fff3e0;
+    color: #e65100;
+
+    span {
+        flex: 1;
+    }
+
+    a {
+        color: #e65100;
+    }
 }
 
-@media (max-width: 400px) {
-    .stats-grid { grid-template-columns: 1fr; }
+:host-context(body.dark-theme) .alert-banner {
+    background: rgba(255, 152, 0, 0.15);
+    color: #ffb74d;
+
+    a {
+        color: #ffb74d;
+    }
+}
+
+.food-item .status-badge {
+    margin-right: 8px;
 }

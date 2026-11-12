@@ -4,49 +4,86 @@
             <h1>Browse Available Food</h1>
             <p class="subtitle">Claim food donations from nearby donors</p>
         </div>
+        <button mat-stroked-button (click)="loadAvailableFoods()" [disabled]="isLoading">
+            <mat-icon>refresh</mat-icon>
+            Refresh
+        </button>
     </div>
 
     <!-- Search and Filters -->
     <mat-card class="filter-card">
-        <mat-form-field appearance="outline" class="search-field">
-            <mat-label>Search food items</mat-label>
-            <input matInput [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()"
-                placeholder="Search by title or type">
-            <mat-icon matPrefix>search</mat-icon>
-        </mat-form-field>
+        <div class="filter-row">
+            <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+                <mat-label>Search food items</mat-label>
+                <input matInput [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()"
+                    placeholder="Title, type, donor or address">
+                <mat-icon matPrefix>search</mat-icon>
+                @if (searchQuery) {
+                <button matSuffix mat-icon-button aria-label="Clear search" (click)="searchQuery = ''; applyFilters()">
+                    <mat-icon>close</mat-icon>
+                </button>
+                }
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="sort-field" subscriptSizing="dynamic">
+                <mat-label>Sort by</mat-label>
+                <mat-select [(ngModel)]="sortOrder" (ngModelChange)="applyFilters()">
+                    <mat-option value="expiry">Expiring soonest</mat-option>
+                    <mat-option value="newest">Newest first</mat-option>
+                    <mat-option value="quantity">Most servings</mat-option>
+                </mat-select>
+            </mat-form-field>
+        </div>
 
         <div class="filter-chips">
-            <mat-chip-set>
-                <mat-chip [highlighted]="selectedType === 'all'" (click)="filterByType('all')">
-                    All
-                </mat-chip>
-                @for (type of availableTypes; track type) {
-                <mat-chip [highlighted]="selectedType === type" (click)="filterByType(type)">
-                    {{ type | titlecase }}
-                </mat-chip>
+            <mat-chip-listbox aria-label="Filter by food type" [hideSingleSelectionIndicator]="true">
+                <mat-chip-option [selected]="selectedType === 'all'" (click)="filterByType('all')">All types</mat-chip-option>
+                @for (type of typeOptions; track type) {
+                <mat-chip-option [selected]="selectedType === type" (click)="filterByType(type)">{{ type }}</mat-chip-option>
                 }
-            </mat-chip-set>
+            </mat-chip-listbox>
+            <mat-chip-listbox aria-label="Urgency" [hideSingleSelectionIndicator]="true">
+                <mat-chip-option [selected]="urgentOnly" (click)="urgentOnly = !urgentOnly; applyFilters()">
+                    <mat-icon matChipAvatar>bolt</mat-icon>
+                    Expiring within 24h
+                </mat-chip-option>
+            </mat-chip-listbox>
+        </div>
+
+        <div class="filter-row secondary">
+            <div class="servings-filter">
+                <span class="servings-label"><mat-icon>groups</mat-icon> At least <strong>{{ minServings }}</strong> servings</span>
+                <mat-slider min="0" [max]="maxServings" step="1" discrete class="servings-slider" aria-label="Minimum servings">
+                    <input matSliderThumb [(ngModel)]="minServings" (ngModelChange)="applyFilters()" />
+                </mat-slider>
+            </div>
+            <mat-button-toggle-group class="view-toggle" [hideSingleSelectionIndicator]="true" [value]="viewMode" (change)="setView($event.value)" aria-label="Layout">
+                <mat-button-toggle value="grid" matTooltip="Grid view" aria-label="Grid view"><mat-icon>grid_view</mat-icon></mat-button-toggle>
+                <mat-button-toggle value="list" matTooltip="List view" aria-label="List view"><mat-icon>view_list</mat-icon></mat-button-toggle>
+            </mat-button-toggle-group>
         </div>
     </mat-card>
 
     @if (isLoading) {
-    <div class="loading-container">
-        <mat-spinner diameter="60"></mat-spinner>
-    </div>
+    <app-skeleton variant="cards" [count]="6"></app-skeleton>
+    } @else if (loadError) {
+    <app-empty-state image="not-found" title="Couldn't load food listings" message="Check your connection and try again.">
+        <button mat-raised-button color="primary" (click)="loadAvailableFoods()">Try again</button>
+    </app-empty-state>
     } @else {
     @if (filteredFoods.length > 0) {
-    <div class="foods-grid">
-        @for (food of filteredFoods; track food._id) {
-        <mat-card class="food-card">
-            <div class="card-header">
-                <div class="food-icon">
-                    <mat-icon>restaurant_menu</mat-icon>
-                </div>
-                <span class="urgency-badge" [class.urgent]="isUrgent(food)">
+    <p class="result-count">{{ filteredFoods.length }} listing{{ filteredFoods.length === 1 ? '' : 's' }} available</p>
+    <div class="foods-grid" [class.list-view]="viewMode === 'list'">
+        @for (food of filteredFoods; track food._id; let i = $index) {
+        <mat-card class="food-card food-card-media" [class.leaving]="leavingId === food._id" appReveal [revealDelay]="(i % 6) * 70">
+            <div class="media">
+                <img class="food-thumb" [src]="foodImage(food.type)" [alt]="food.type || 'Food'" loading="lazy" />
+                <span class="urgency-badge" [class.urgent]="isUrgent(food)" [class.pulse]="isUrgent(food)">
                     {{ getUrgencyText(food) }}
                 </span>
             </div>
 
+            <div class="card-main">
             <h3>{{ food.title }}</h3>
 
             @if (food.type) {
@@ -68,12 +105,16 @@
                 </div>
                 <div class="detail-row">
                     <mat-icon>place</mat-icon>
-                    <span>{{ food.pickupLocation }}</span>
+                    <a [href]="mapsLink(food)" target="_blank" rel="noopener" matTooltip="Open in Google Maps">
+                        {{ food.pickupLocation }}
+                    </a>
                 </div>
             </div>
 
-            <button mat-raised-button color="primary" class="claim-button" (click)="claimFood(food)"
-                [disabled]="isClaimingFood === food._id">
+            </div>
+
+            <button mat-raised-button color="primary" class="claim-button" (click)="claimFood(food, $event)"
+                [disabled]="isClaimingFood !== null">
                 @if (isClaimingFood === food._id) {
                 <mat-spinner diameter="20"></mat-spinner>
                 } @else {
@@ -85,22 +126,14 @@
         }
     </div>
     } @else {
-    <div class="empty-state">
-        <mat-icon>search_off</mat-icon>
-        <h2>No food items found</h2>
-        <p>
-            @if (searchQuery || selectedType !== 'all') {
-            Try adjusting your filters
-            } @else {
-            No food available at the moment
-            }
-        </p>
-        @if (searchQuery || selectedType !== 'all') {
+    <app-empty-state image="empty-basket" title="No food items found"
+        [message]="hasActiveFilters ? 'Try adjusting your filters.' : 'No food is available right now. Check back soon, new listings appear all the time.'">
+        @if (hasActiveFilters) {
         <button mat-raised-button (click)="clearFilters()">
             Clear Filters
         </button>
         }
-    </div>
+    </app-empty-state>
     }
     }
 </div>

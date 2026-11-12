@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, map } from 'rxjs';
 import { environment } from '../../../environments/environment';
-import { FoodItem, FoodResponse, CreateFoodData } from '../models';
+import { FoodItem, FoodResponse, CreateFoodData, UpdateFoodData, refId } from '../models';
 
 @Injectable({
   providedIn: 'root'
@@ -12,33 +12,34 @@ export class FoodService {
 
   constructor(private http: HttpClient) {}
 
-  // Get all food items
-  getAllFoods(): Observable<FoodResponse> {
-    return this.http.get<FoodResponse>(this.apiUrl);
+  /** All listings, donor populated with name/email. */
+  getAllFoods(): Observable<FoodItem[]> {
+    return this.http.get<FoodResponse>(this.apiUrl).pipe(map(r => this.toList(r)));
   }
 
-  // Get only available food items
-  getAvailableFoods(): Observable<FoodResponse> {
-    return this.http.get<FoodResponse>(`${this.apiUrl}/available`);
+  /** Listings with status "available". */
+  getAvailableFoods(): Observable<FoodItem[]> {
+    return this.http.get<FoodResponse>(`${this.apiUrl}/available`).pipe(map(r => this.toList(r)));
   }
 
-  // Create new food listing (donors only)
+  /** The backend has no per-donor endpoint, so filter the full list. */
+  getMyFoods(userId: string): Observable<FoodItem[]> {
+    return this.getAllFoods().pipe(map(foods => foods.filter(f => refId(f.donor) === userId)));
+  }
+
   createFood(foodData: CreateFoodData): Observable<FoodResponse> {
     return this.http.post<FoodResponse>(`${this.apiUrl}/add-foodItem`, foodData);
   }
 
-  // Update food item (donors/admin only)
-  updateFood(foodId: string, updates: Partial<FoodItem>): Observable<FoodResponse> {
+  updateFood(foodId: string, updates: UpdateFoodData): Observable<FoodResponse> {
     return this.http.patch<FoodResponse>(`${this.apiUrl}/update-foodItem/${foodId}`, updates);
   }
 
-  // Delete food item (donors/admin only)
-  deleteFood(foodId: string): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/delete-foodItem/${foodId}`);
+  deleteFood(foodId: string): Observable<FoodResponse> {
+    return this.http.delete<FoodResponse>(`${this.apiUrl}/delete-foodItem/${foodId}`);
   }
 
-  // Helper method to get donor's own foods (client-side filtering)
-  getMyFoods(userId: string): Observable<FoodResponse> {
-    return this.getAllFoods();
+  private toList(response: FoodResponse): FoodItem[] {
+    return Array.isArray(response?.food) ? response.food : [];
   }
 }
